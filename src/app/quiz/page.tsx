@@ -1182,6 +1182,151 @@ const waterPokemon: Pokemon[] = [
 	},
 ];
 
+// export default function QuizPage() {
+// 	const [stage, setStage] = useState<"grass" | "fire" | "water" | "result">(
+// 		"grass"
+// 	);
+// 	const [remainingGrass, setRemainingGrass] = useState(grassPokemon);
+// 	const [remainingFire, setRemainingFire] = useState(firePokemon);
+// 	const [remainingWater, setRemainingWater] = useState(waterPokemon);
+
+// 	const [finalGrass, setFinalGrass] = useState<Pokemon | null>(null);
+// 	const [finalFire, setFinalFire] = useState<Pokemon | null>(null);
+// 	const [finalWater, setFinalWater] = useState<Pokemon | null>(null);
+
+// 	const fetchPokemonImages = async (pokemonList: Pokemon[]) => {
+// 		const updatedPokemon = await Promise.all(
+// 			pokemonList.map(async (pokemon) => {
+// 				try {
+// 					const res = await fetch(`/api/pokemon/${pokemon.name}`);
+// 					const data = await res.json();
+// 					return { ...pokemon, image: data.imageUrl || null };
+// 				} catch (error) {
+// 					console.error(
+// 						`Failed to fetch image for ${pokemon.name}`,
+// 						error
+// 					);
+// 					return pokemon;
+// 				}
+// 			})
+// 		);
+// 		return updatedPokemon;
+// 	};
+
+// 	useEffect(() => {
+// 		const loadPokemonImages = async () => {
+// 			setRemainingGrass(await fetchPokemonImages(grassPokemon));
+// 			setRemainingFire(await fetchPokemonImages(firePokemon));
+// 			setRemainingWater(await fetchPokemonImages(waterPokemon));
+// 		};
+
+// 		loadPokemonImages();
+// 	}, []);
+
+// 	const handleEliminate = (
+// 		type: "grass" | "fire" | "water",
+// 		index: number
+// 	) => {
+// 		if (type === "grass") {
+// 			const newGrass = remainingGrass.filter((_, i) => i !== index);
+// 			setRemainingGrass(newGrass);
+// 			if (newGrass.length === 1) {
+// 				setFinalGrass(newGrass[0]);
+// 				setStage("fire");
+// 			}
+// 		} else if (type === "fire") {
+// 			const newFire = remainingFire.filter((_, i) => i !== index);
+// 			setRemainingFire(newFire);
+// 			if (newFire.length === 1) {
+// 				setFinalFire(newFire[0]);
+// 				setStage("water");
+// 			}
+// 		} else if (type === "water") {
+// 			const newWater = remainingWater.filter((_, i) => i !== index);
+// 			setRemainingWater(newWater);
+// 			if (newWater.length === 1) {
+// 				setFinalWater(newWater[0]);
+// 				setStage("result");
+// 			}
+// 		}
+// 	};
+
+// 	const renderOptions = (
+// 		type: "grass" | "fire" | "water",
+// 		pokemonList: Pokemon[]
+// 	) => (
+// 		<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+// 			{pokemonList.map((pokemon, index) => (
+// 				<div
+// 					key={index}
+// 					className="flex flex-col items-center bg-white shadow-md rounded-lg p-4"
+// 				>
+// 					<p className="text-sm text-gray-600">
+// 						{pokemon.description}
+// 					</p>
+// 					<button
+// 						onClick={() => handleEliminate(type, index)}
+// 						className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+// 					>
+// 						Eliminate
+// 					</button>
+// 				</div>
+// 			))}
+// 		</div>
+// 	);
+
+// 	if (stage === "result") {
+// 		return (
+// 			<div className="text-center mt-8">
+// 				<h1 className="text-3xl font-bold">
+// 					Your Pokémon Starters Are:
+// 				</h1>
+// 				<div className="flex justify-center gap-8 mt-6">
+// 					{[finalGrass, finalFire, finalWater].map(
+// 						(pokemon, index) => (
+// 							<div
+// 								key={index}
+// 								className="flex flex-col items-center"
+// 							>
+// 								{pokemon?.image && (
+// 									<Image
+// 										src={pokemon.image}
+// 										alt={pokemon.name || "Pokemon"}
+// 										width={150}
+// 										height={150}
+// 										className="rounded-md"
+// 									/>
+// 								)}
+// 								<h2 className="text-xl font-semibold mt-2">
+// 									{pokemon?.name}
+// 								</h2>
+// 								<p className="text-sm text-gray-600">
+// 									{pokemon?.description}
+// 								</p>
+// 							</div>
+// 						)
+// 					)}
+// 				</div>
+// 			</div>
+// 		);
+// 	}
+
+// 	return (
+// 		<div className="max-w-4xl mx-auto p-8">
+// 			<h1 className="text-2xl font-bold mb-6">
+// 				{stage === "grass" && "Choose Your Grass Pokémon"}
+// 				{stage === "fire" && "Choose Your Fire Pokémon"}
+// 				{stage === "water" && "Choose Your Water Pokémon"}
+// 			</h1>
+// 			<div className="space-y-8">
+// 				{stage === "grass" && renderOptions("grass", remainingGrass)}
+// 				{stage === "fire" && renderOptions("fire", remainingFire)}
+// 				{stage === "water" && renderOptions("water", remainingWater)}
+// 			</div>
+// 		</div>
+// 	);
+// }
+
 export default function QuizPage() {
 	const [stage, setStage] = useState<"grass" | "fire" | "water" | "result">(
 		"grass"
@@ -1251,42 +1396,85 @@ export default function QuizPage() {
 		}
 	};
 
+	const getTypeStyles = (type: "grass" | "fire" | "water") => {
+		switch (type) {
+			case "grass":
+				return {
+					background: "bg-green-100",
+					border: "border-green-500",
+					button: "bg-green-500 hover:bg-green-600",
+					text: "text-green-800",
+				};
+			case "fire":
+				return {
+					background: "bg-orange-100",
+					border: "border-orange-500",
+					button: "bg-orange-500 hover:bg-orange-600",
+					text: "text-orange-800",
+				};
+			case "water":
+				return {
+					background: "bg-blue-100",
+					border: "border-blue-500",
+					button: "bg-blue-500 hover:bg-blue-600",
+					text: "text-blue-800",
+				};
+			default:
+				return {
+					background: "bg-gray-100",
+					border: "border-gray-500",
+					button: "bg-gray-500 hover:bg-gray-600",
+					text: "text-gray-800",
+				};
+		}
+	};
+
 	const renderOptions = (
 		type: "grass" | "fire" | "water",
 		pokemonList: Pokemon[]
-	) => (
-		<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-			{pokemonList.map((pokemon, index) => (
-				<div
-					key={index}
-					className="flex flex-col items-center bg-white shadow-md rounded-lg p-4"
-				>
-					<p className="text-sm text-gray-600">
-						{pokemon.description}
-					</p>
-					<button
-						onClick={() => handleEliminate(type, index)}
-						className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+	) => {
+		const styles = getTypeStyles(type);
+		return (
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+				{pokemonList.map((pokemon, index) => (
+					<div
+						key={index}
+						className={`flex flex-col items-center ${styles.background} ${styles.border} border shadow-md rounded-lg p-4`}
 					>
-						Eliminate
-					</button>
-				</div>
-			))}
-		</div>
-	);
+						<p className={`text-sm ${styles.text}`}>
+							{pokemon.description}
+						</p>
+						<button
+							onClick={() => handleEliminate(type, index)}
+							className={`mt-4 px-4 py-2 ${styles.button} text-white rounded-lg transition`}
+						>
+							Eliminate
+						</button>
+					</div>
+				))}
+			</div>
+		);
+	};
 
 	if (stage === "result") {
 		return (
 			<div className="text-center mt-8">
-				<h1 className="text-3xl font-bold">
+				<h1 className="text-3xl font-bold mb-6">
 					Your Pokémon Starters Are:
 				</h1>
-				<div className="flex justify-center gap-8 mt-6">
-					{[finalGrass, finalFire, finalWater].map(
-						(pokemon, index) => (
+				<div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-6">
+					{[
+						{ pokemon: finalGrass, type: "grass" },
+						{ pokemon: finalFire, type: "fire" },
+						{ pokemon: finalWater, type: "water" },
+					].map(({ pokemon, type }, index) => {
+						const styles = getTypeStyles(
+							type as "grass" | "fire" | "water"
+						);
+						return (
 							<div
 								key={index}
-								className="flex flex-col items-center"
+								className={`flex flex-col items-center ${styles.background} ${styles.border} border shadow-md rounded-lg p-4 w-64`}
 							>
 								{pokemon?.image && (
 									<Image
@@ -1297,23 +1485,29 @@ export default function QuizPage() {
 										className="rounded-md"
 									/>
 								)}
-								<h2 className="text-xl font-semibold mt-2">
+								<h2
+									className={`text-xl font-semibold mt-2 ${styles.text}`}
+								>
 									{pokemon?.name}
 								</h2>
-								<p className="text-sm text-gray-600">
+								<p className={`text-sm ${styles.text} mt-2`}>
 									{pokemon?.description}
 								</p>
 							</div>
-						)
-					)}
+						);
+					})}
 				</div>
 			</div>
 		);
 	}
 
+	const styles = getTypeStyles(stage);
+
 	return (
-		<div className="max-w-4xl mx-auto p-8">
-			<h1 className="text-2xl font-bold mb-6">
+		<div
+			className={`max-w-4xl mx-auto p-8 ${styles.background} min-h-screen`}
+		>
+			<h1 className={`text-2xl font-bold mb-6 ${styles.text}`}>
 				{stage === "grass" && "Choose Your Grass Pokémon"}
 				{stage === "fire" && "Choose Your Fire Pokémon"}
 				{stage === "water" && "Choose Your Water Pokémon"}
