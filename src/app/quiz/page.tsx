@@ -1966,6 +1966,16 @@ export default function QuizPage() {
 		<div
 			className={`max-w-4xl mx-auto p-8 ${styles.background} min-h-screen`}
 		>
+			<button
+				className="fixed top-4 right-4 z-50 bg-white p-2 rounded-full shadow-md"
+				onClick={() => {
+					if (audioRef.current) {
+						audioRef.current.muted = !audioRef.current.muted;
+					}
+				}}
+			>
+				{audioRef.current && !audioRef.current.muted ? "🔊" : "🔇"}
+			</button>
 			<AnimatedTitle />
 			<h2 className={`text-2xl font-bold mb-6 ${styles.text}`}>
 				{stage === "grass" && "Choose Your Grass Pokémon"}
