@@ -1525,6 +1525,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import GrassAnimation from "@/components/GrassAnimation";
+import FireAnimation from "@/components/FireAnimation";
+import WaterAnimation from "@/components/WaterAnimation";
 
 interface Pokemon {
 	name: string;
@@ -1978,9 +1981,12 @@ export default function QuizPage() {
 			</button>
 			<AnimatedTitle />
 			<h2 className={`text-2xl font-bold mb-6 ${styles.text}`}>
-				{stage === "grass" && "Choose Your Grass Pokémon"}
+				{/* {stage === "grass" && "Choose Your Grass Pokémon"}
 				{stage === "fire" && "Choose Your Fire Pokémon"}
-				{stage === "water" && "Choose Your Water Pokémon"}
+				{stage === "water" && "Choose Your Water Pokémon"} */}
+				{stage === "grass" && <GrassAnimation />}
+				{stage === "fire" && <FireAnimation />}
+				{stage === "water" && <WaterAnimation />}
 			</h2>
 			<div className="space-y-8">
 				{stage === "grass" && renderOptions("grass", remainingGrass)}
