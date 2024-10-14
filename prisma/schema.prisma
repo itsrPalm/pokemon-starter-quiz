@@ -1,0 +1,20 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model QuizResult {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  trainerName   String
+  grassPokemon  String
+  firePokemon   String
+  waterPokemon  String
+  teamSummary   String
+}

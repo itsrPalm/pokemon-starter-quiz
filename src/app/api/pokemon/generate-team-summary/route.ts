@@ -1,6 +1,6 @@
 // /src/app/api/pokemon/generate-team-summary/route.ts
 
-import { generateTeamSummary } from "@/app/actions/generateTeamSummary";
+import { generateTeamSummary } from "@/actions/generateTeamSummary";
 import { NextRequest, NextResponse } from "next/server";
 // import { generateTeamSummary } from '@/actions/generateTeamSummary';
 

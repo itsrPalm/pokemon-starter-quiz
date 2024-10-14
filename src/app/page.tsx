@@ -657,12 +657,63 @@ export default function QuizPage() {
 	const [teamSummary, setTeamSummary] = useState<string>("");
 	const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(false);
 
+	const [shareLink, setShareLink] = useState<string | null>(null);
+	const [isSharing, setIsSharing] = useState<boolean>(false);
+
+	const [trainerName, setTrainerName] = useState<string>("");
+	const [isNamePromptVisible, setIsNamePromptVisible] =
+		useState<boolean>(false);
+
 	const legendAudioRef = useRef<HTMLAudioElement | null>(null);
 	const grassAudioRef = useRef<HTMLAudioElement | null>(null);
 	const fireAudioRef = useRef<HTMLAudioElement | null>(null);
 	const waterAudioRef = useRef<HTMLAudioElement | null>(null);
 	const eliminateAudioRef = useRef<HTMLAudioElement | null>(null);
 	const sendingOffAudioRef = useRef<HTMLAudioElement | null>(null);
+
+	// Function to handle sharing the results
+	const handleShareResults = async () => {
+		if (!trainerName.trim()) {
+			alert("Please enter your name before sharing your results.");
+			return;
+		}
+
+		setIsSharing(true);
+
+		// Prepare the data to be saved
+		const grassPokemons = rankOrder("grass");
+		const firePokemons = rankOrder("fire");
+		const waterPokemons = rankOrder("water");
+
+		try {
+			const response = await fetch("/api/save-results", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					trainerName,
+					grassPokemon: grassPokemons,
+					firePokemon: firePokemons,
+					waterPokemon: waterPokemons,
+					teamSummary,
+				}),
+			});
+
+			const data = await response.json();
+
+			if (response.ok) {
+				// Generate the shareable link
+				const link = `${window.location.origin}/share/${data.id}`;
+				setShareLink(link);
+				setIsNamePromptVisible(false);
+			} else {
+				console.error("Error saving results:", data.error);
+			}
+		} catch (error) {
+			console.error("Error saving results:", error);
+		} finally {
+			setIsSharing(false);
+		}
+	};
 
 	useEffect(() => {
 		// Initialize audio references
@@ -1087,7 +1138,7 @@ ${allPokemon
 	)
 	.join("\n\n")}
 
-Provide an uplifting summary that highlights the strengths and synergy of the team.
+Provide an uplifting summary that highlights the strengths and synergy of the team. Make sure to complete your last sentence.
 `;
 
 		try {
@@ -1209,7 +1260,7 @@ Provide an uplifting summary that highlights the strengths and synergy of the te
 							) : (
 								teamSummary && (
 									<div className="bg-white p-6 rounded-lg shadow-md mb-6">
-										<h2 className="text-2xl font-bold mb-4 text-center text-purple-800">
+										<h2 className="text-2xl font-bold mb-4 text-center text-purple-800 text-purple-700">
 											Your Pokémon Starter Team Summary
 										</h2>
 										<p className="text-gray-800 text-justify">
@@ -1301,6 +1352,68 @@ Provide an uplifting summary that highlights the strengths and synergy of the te
 											}
 										);
 									}
+								)}
+							</div>
+
+							{/* Share Results Button */}
+							<div className="text-center mt-6">
+								{stage === "result" && (
+									<div className="text-center mt-6">
+										{!shareLink ? (
+											<>
+												{isNamePromptVisible ? (
+													<div className="mt-4">
+														<input
+															type="text"
+															placeholder="Enter your name"
+															value={trainerName}
+															onChange={(e) =>
+																setTrainerName(
+																	e.target
+																		.value
+																)
+															}
+															className="px-4 py-2 border rounded-lg mr-2 text-purple-700"
+														/>
+														<button
+															onClick={
+																handleShareResults
+															}
+															className="px-4 py-2 rounded bg-purple-500 hover:bg-purple-600 text-white"
+														>
+															{isSharing
+																? "Sharing..."
+																: "Confirm"}
+														</button>
+													</div>
+												) : (
+													<button
+														onClick={() =>
+															setIsNamePromptVisible(
+																true
+															)
+														}
+														className="px-4 py-2 rounded bg-purple-500 hover:bg-purple-600 text-white"
+													>
+														Share Your Results
+													</button>
+												)}
+											</>
+										) : (
+											<div className="mt-4">
+												<p className="text-green-600 font-semibold">
+													Share this link to show your
+													results:
+												</p>
+												<a
+													href={shareLink}
+													className="text-blue-500 underline"
+												>
+													{shareLink}
+												</a>
+											</div>
+										)}
+									</div>
 								)}
 							</div>
 						</motion.div>
