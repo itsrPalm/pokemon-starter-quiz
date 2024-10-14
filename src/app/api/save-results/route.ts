@@ -211,8 +211,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { SaveResultsRequestBody, SaveResultsResponse } from "@/types/api";
-import { Pokemon } from "@/types/Pokemon";
 import { Prisma } from "@prisma/client";
+import { Pokemon } from "@/types/Pokemon";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
 	try {
