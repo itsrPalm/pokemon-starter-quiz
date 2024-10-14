@@ -1712,12 +1712,12 @@ const AnimatedTitle = () => {
 			<h1 className="text-4xl md:text-6xl font-bold pokemon-title relative inline-block">
 				<span className="relative z-10">
 					<span className="text-yellow-400">P</span>
-					<span className="text-blue-500">O</span>
-					<span className="text-red-500">K</span>
-					<span className="text-green-500">E</span>
-					<span className="text-yellow-400">M</span>
-					<span className="text-blue-500">O</span>
-					<span className="text-red-500">N</span>
+					<span className="text-blue-500">o</span>
+					<span className="text-red-500">k</span>
+					<span className="text-green-500">É</span>
+					<span className="text-yellow-400">m</span>
+					<span className="text-blue-500">o</span>
+					<span className="text-red-500">n</span>
 				</span>
 				<span className="block text-2xl md:text-4xl mt-2 text-white">
 					STARTER QUIZ
