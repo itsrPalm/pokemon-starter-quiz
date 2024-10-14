@@ -15,4 +15,5 @@ model QuizResult {
   firePokemon   Json
   waterPokemon  Json
   teamSummary   String
+  audioData     Bytes?   // Add this line
 }
