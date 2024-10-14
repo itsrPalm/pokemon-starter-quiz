@@ -39,8 +39,8 @@ export async function generateTeamSummary(prompt: string): Promise<string> {
 	try {
 		const completion = await openai.chat.completions.create({
 			// model: "gpt-4", // Use 'gpt-4' model
-			// model: "gpt-3.5-turbo-0125",
-			model: "gpt-4o-mini",
+			model: "gpt-3.5-turbo-0125",
+			// model: "gpt-4o-mini",
 			messages: [{ role: "user", content: prompt }],
 			max_tokens: 256,
 			temperature: 0.7,
