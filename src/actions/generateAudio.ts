@@ -16,7 +16,8 @@ export async function generateAudio(text: string): Promise<Buffer> {
 	const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
 
 	const headers = {
-		Accept: "audio/mpeg",
+		// Accept: "audio/mpeg",
+		Accept: "audio/mp3",
 		"Content-Type": "application/json",
 		"xi-api-key": apiKey,
 	};
