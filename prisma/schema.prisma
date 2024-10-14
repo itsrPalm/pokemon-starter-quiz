@@ -1,46 +1,10 @@
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
-// generator client {
-//   provider = "prisma-client-js"
-// }
-
-// // model QuizResult {
-// //   id            String   @id @default(cuid())
-// //   createdAt     DateTime @default(now())
-// //   trainerName   String?
-// //   grassPokemon  Json
-// //   firePokemon   Json
-// //   waterPokemon  Json
-// //   teamSummary   String
-// //   audioData     Bytes?   // Add this line
-// // }
-
-
-// model QuizResult {
-//   id            String   @id @default(cuid())
-//   createdAt     DateTime @default(now())
-//   trainerName   String?
-//   grassPokemon  Json
-//   firePokemon   Json
-//   waterPokemon  Json
-//   teamSummary   String
-//   audioData     Bytes?
-//   audioStatus   String   @default("pending") // New field to track audio generation status
-// }
-
-
-// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model QuizResult {
