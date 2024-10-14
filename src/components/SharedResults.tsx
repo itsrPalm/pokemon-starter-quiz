@@ -1076,7 +1076,7 @@ export default function SharedResults({
 				if (data.audioStatus === "completed" && data.audioBase64) {
 					const audioBlob = new Blob(
 						[Buffer.from(data.audioBase64, "base64")],
-						{ type: "audio/mpeg" }
+						{ type: "audio/mp3" }
 					);
 					audioUrl = URL.createObjectURL(audioBlob);
 					const audioElement = new Audio(audioUrl);
