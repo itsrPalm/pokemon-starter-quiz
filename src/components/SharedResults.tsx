@@ -345,8 +345,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FaPlay, FaPause } from "react-icons/fa";
 import { Pokemon } from "@/types/Pokemon";
-// import { Pokemon } from "@/types/pokemon";
-// import { Pokemon } from "@/types/Pokemon";
 
 interface SharedResultsProps {
 	allPokemon: Pokemon[];
