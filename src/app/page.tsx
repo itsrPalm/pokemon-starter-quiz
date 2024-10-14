@@ -5296,7 +5296,7 @@ const AnimatedTitle = () => {
 					<span className="text-yellow-400">P</span>
 					<span className="text-blue-500">O</span>
 					<span className="text-red-500">K</span>
-					<span className="text-green-500">E</span>
+					<span className="text-green-500">É</span>
 					<span className="text-yellow-400">M</span>
 					<span className="text-blue-500">O</span>
 					<span className="text-red-500">N</span>
