@@ -6,7 +6,17 @@
 		"dev": "next dev",
 		"build": "prisma generate && next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"postinstall": "prisma generate",
+		"stripewebhook": "stripe listen --forward-to localhost:420/api/stripe/webhook",
+		"webhook": "stripe listen --forward-to http://localhost:420/api/merchandise/webhooks/stripe/transact",
+		"eventtrigger": "stripe trigger payment_intent.succeeded",
+		"postgresqlinstall": "bunx prisma init --datasource-provider postgresql",
+		"setdb": "prisma db pull",
+		"vercel-build": "prisma generate && prisma migrate deploy && next build",
+		"create-migrate": "prisma migrate dev --name init",
+		"migrate": "prisma migrate deploy",
+		"view-db": "prisma studio"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.20.0",

@@ -1,7 +1,5 @@
-// prisma/schema.prisma
-
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -12,9 +10,9 @@ generator client {
 model QuizResult {
   id            String   @id @default(cuid())
   createdAt     DateTime @default(now())
-  trainerName   String
-  grassPokemon  String
-  firePokemon   String
-  waterPokemon  String
+  trainerName   String?
+  grassPokemon  Json
+  firePokemon   Json
+  waterPokemon  Json
   teamSummary   String
 }
