@@ -13,7 +13,7 @@ export async function generateTeamSummary(prompt: string): Promise<string> {
 		const completion = await openai.chat.completions.create({
 			model: "gpt-4o-mini", // Use 'gpt-4' model
 			messages: [{ role: "user", content: prompt }],
-			max_tokens: 1024,
+			max_tokens: 512,
 			temperature: 0.7,
 		});
 
