@@ -99,7 +99,7 @@ export default function SharedResults({
 	return (
 		<div className="min-h-screen w-full bg-gradient-to-b from-blue-100 to-purple-100">
 			<div className="relative z-10 max-w-4xl mx-auto p-4 md:p-8">
-				<h1 className="text-3xl md:text-6xl font-bold text-center my-4">
+				<h1 className="text-3xl md:text-6xl font-bold text-center my-4 text-purple-800">
 					{trainerName}&apos;s Pokémon Starter Team
 				</h1>
 
