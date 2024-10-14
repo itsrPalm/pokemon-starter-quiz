@@ -100,8 +100,6 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import SharedResults from "@/components/SharedResults";
 import { Pokemon } from "@/types/Pokemon";
-// import { Pokemon } from "@/types/pokemon";
-// import { Pokemon } from "@/types/Pokemon";
 
 export default async function SharedResultPage({
 	params,
