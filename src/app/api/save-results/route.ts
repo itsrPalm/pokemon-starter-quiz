@@ -1,97 +1,150 @@
-// // import { NextRequest, NextResponse } from "next/server";
-// // import { prisma } from "../../../lib/prisma";
+// // // import { NextRequest, NextResponse } from "next/server";
+// // // import { prisma } from "../../../lib/prisma";
+
+// // // export async function POST(request: NextRequest) {
+// // // 	try {
+// // // 		const {
+// // // 			trainerName,
+// // // 			grassPokemon,
+// // // 			firePokemon,
+// // // 			waterPokemon,
+// // // 			teamSummary,
+// // // 		} = await request.json();
+
+// // // 		if (!trainerName || typeof trainerName !== "string") {
+// // // 			return NextResponse.json(
+// // // 				{ error: "Trainer name is required and must be a string." },
+// // // 				{ status: 400 }
+// // // 			);
+// // // 		}
+
+// // // 		const result = await prisma.quizResult.create({
+// // // 			data: {
+// // // 				trainerName,
+// // // 				grassPokemon,
+// // // 				firePokemon,
+// // // 				waterPokemon,
+// // // 				teamSummary,
+// // // 			},
+// // // 		});
+
+// // // 		return NextResponse.json({ id: result.id });
+// // // 	} catch (error) {
+// // // 		console.error("Error saving results:", error);
+// // // 		return NextResponse.json(
+// // // 			{ error: "An error occurred while saving the results." },
+// // // 			{ status: 500 }
+// // // 		);
+// // // 	}
+// // // }
+
+// // import { NextRequest, NextResponse } from 'next/server';
+// // import { prisma } from '../../../lib/prisma';
+// // import { generateAudio } from '../../../actions/generateAudio';
 
 // // export async function POST(request: NextRequest) {
-// // 	try {
-// // 		const {
-// // 			trainerName,
-// // 			grassPokemon,
-// // 			firePokemon,
-// // 			waterPokemon,
-// // 			teamSummary,
-// // 		} = await request.json();
+// //   try {
+// //     const { trainerName, grassPokemon, firePokemon, waterPokemon, teamSummary } = await request.json();
 
-// // 		if (!trainerName || typeof trainerName !== "string") {
-// // 			return NextResponse.json(
-// // 				{ error: "Trainer name is required and must be a string." },
-// // 				{ status: 400 }
-// // 			);
-// // 		}
+// //     if (!trainerName || typeof trainerName !== 'string') {
+// //       return NextResponse.json(
+// //         { error: 'Trainer name is required and must be a string.' },
+// //         { status: 400 }
+// //       );
+// //     }
 
-// // 		const result = await prisma.quizResult.create({
-// // 			data: {
-// // 				trainerName,
-// // 				grassPokemon,
-// // 				firePokemon,
-// // 				waterPokemon,
-// // 				teamSummary,
-// // 			},
-// // 		});
+// //     // Prepare the full text for audio generation
+// //     const fullText = `${trainerName}'s Pokémon Starter Team.\n\n${teamSummary}`;
 
-// // 		return NextResponse.json({ id: result.id });
-// // 	} catch (error) {
-// // 		console.error("Error saving results:", error);
-// // 		return NextResponse.json(
-// // 			{ error: "An error occurred while saving the results." },
-// // 			{ status: 500 }
-// // 		);
-// // 	}
+// //     // Generate the audio
+// //     const audioBuffer = await generateAudio(fullText);
+
+// //     // Convert audio buffer to base64 string
+// //     const audioBase64 = audioBuffer.toString('base64');
+
+// //     // Save the result to the database, including the audio data
+// //     const result = await prisma.quizResult.create({
+// //       data: {
+// //         trainerName,
+// //         grassPokemon,
+// //         firePokemon,
+// //         waterPokemon,
+// //         teamSummary,
+// //         audioData: audioBuffer,
+// //       },
+// //     });
+
+// //     return NextResponse.json({ id: result.id });
+// //   } catch (error) {
+// //     console.error('Error saving results:', error);
+// //     return NextResponse.json(
+// //       { error: 'An error occurred while saving the results.' },
+// //       { status: 500 }
+// //     );
+// //   }
 // // }
 
-// import { NextRequest, NextResponse } from 'next/server';
-// import { prisma } from '../../../lib/prisma';
-// import { generateAudio } from '../../../actions/generateAudio';
+// // /src/app/api/save-results/route.ts
+
+// import { NextRequest, NextResponse } from "next/server";
+// import { prisma } from "../../../lib/prisma";
+// import { generateAudio } from "../../../actions/generateAudio";
 
 // export async function POST(request: NextRequest) {
-//   try {
-//     const { trainerName, grassPokemon, firePokemon, waterPokemon, teamSummary } = await request.json();
+// 	try {
+// 		const {
+// 			trainerName,
+// 			grassPokemon,
+// 			firePokemon,
+// 			waterPokemon,
+// 			teamSummary,
+// 		} = await request.json();
 
-//     if (!trainerName || typeof trainerName !== 'string') {
-//       return NextResponse.json(
-//         { error: 'Trainer name is required and must be a string.' },
-//         { status: 400 }
-//       );
-//     }
+// 		if (!trainerName || typeof trainerName !== "string") {
+// 			return NextResponse.json(
+// 				{ error: "Trainer name is required and must be a string." },
+// 				{ status: 400 }
+// 			);
+// 		}
 
-//     // Prepare the full text for audio generation
-//     const fullText = `${trainerName}'s Pokémon Starter Team.\n\n${teamSummary}`;
+// 		// Prepare the full text for audio generation
+// 		const fullText = `${trainerName}'s Pokémon Starter Team.\n\n${teamSummary}`;
 
-//     // Generate the audio
-//     const audioBuffer = await generateAudio(fullText);
+// 		// Generate the audio
+// 		const audioBuffer = await generateAudio(fullText);
 
-//     // Convert audio buffer to base64 string
-//     const audioBase64 = audioBuffer.toString('base64');
+// 		// Save the result to the database, including the audio data
+// 		const result = await prisma.quizResult.create({
+// 			data: {
+// 				trainerName,
+// 				grassPokemon,
+// 				firePokemon,
+// 				waterPokemon,
+// 				teamSummary,
+// 				audioData: audioBuffer,
+// 			},
+// 		});
 
-//     // Save the result to the database, including the audio data
-//     const result = await prisma.quizResult.create({
-//       data: {
-//         trainerName,
-//         grassPokemon,
-//         firePokemon,
-//         waterPokemon,
-//         teamSummary,
-//         audioData: audioBuffer,
-//       },
-//     });
-
-//     return NextResponse.json({ id: result.id });
-//   } catch (error) {
-//     console.error('Error saving results:', error);
-//     return NextResponse.json(
-//       { error: 'An error occurred while saving the results.' },
-//       { status: 500 }
-//     );
-//   }
+// 		return NextResponse.json({ id: result.id });
+// 	} catch (error) {
+// 		console.error("Error saving results:", error);
+// 		return NextResponse.json(
+// 			{ error: "An error occurred while saving the results." },
+// 			{ status: 500 }
+// 		);
+// 	}
 // }
 
 // /src/app/api/save-results/route.ts
 
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
-import { generateAudio } from "../../../actions/generateAudio";
+// import { prisma } from '../../../../lib/prisma';
 
 export async function POST(request: NextRequest) {
 	try {
+		console.log("Received request at /api/save-results");
+
 		const {
 			trainerName,
 			grassPokemon,
@@ -101,19 +154,15 @@ export async function POST(request: NextRequest) {
 		} = await request.json();
 
 		if (!trainerName || typeof trainerName !== "string") {
+			console.log("Invalid trainerName");
 			return NextResponse.json(
 				{ error: "Trainer name is required and must be a string." },
 				{ status: 400 }
 			);
 		}
 
-		// Prepare the full text for audio generation
-		const fullText = `${trainerName}'s Pokémon Starter Team.\n\n${teamSummary}`;
-
-		// Generate the audio
-		const audioBuffer = await generateAudio(fullText);
-
-		// Save the result to the database, including the audio data
+		// Save the result to the database without audioData
+		console.log("Saving result to database");
 		const result = await prisma.quizResult.create({
 			data: {
 				trainerName,
@@ -121,9 +170,31 @@ export async function POST(request: NextRequest) {
 				firePokemon,
 				waterPokemon,
 				teamSummary,
-				audioData: audioBuffer,
+				// audioData is not set here
+				audioStatus: "pending",
 			},
 		});
+
+		console.log("Result saved, returning response");
+
+		// Optionally, trigger the audio processing endpoint asynchronously
+		// We'll use a background process or scheduled function for audio generation
+		// If you want to trigger it immediately, you can send a request to the processing endpoint
+		// However, this is optional and depends on your infrastructure
+
+		// Example of triggering the audio processing endpoint (Optional)
+		// Note: Be cautious with this approach as it may contribute to execution time
+		/*
+    fetch(`${process.env.BASE_URL}/api/process-pending-audios`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: result.id }),
+    })
+      .then(() => console.log('Audio processing triggered'))
+      .catch((error) => console.error('Error triggering audio processing:', error));
+    */
 
 		return NextResponse.json({ id: result.id });
 	} catch (error) {

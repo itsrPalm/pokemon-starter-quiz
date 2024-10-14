@@ -46,9 +46,10 @@
 
 // /src/app/share/[id]/page.tsx
 
-import { prisma } from "../../../lib/prisma";
+// import { prisma } from '../../../../lib/prisma';
 import { notFound } from "next/navigation";
 import SharedResults from "../../../components/SharedResults";
+import { prisma } from "@/lib/prisma";
 import { Pokemon } from "@/types/pokemon";
 // import { Pokemon } from '../../../types/Pokemon';
 
@@ -71,7 +72,6 @@ export default async function SharedResultPage({
 		firePokemon,
 		waterPokemon,
 		teamSummary,
-		audioData,
 	} = result;
 
 	const grassPokemons: Pokemon[] = grassPokemon as unknown as Pokemon[];
@@ -84,17 +84,12 @@ export default async function SharedResultPage({
 		...waterPokemons,
 	];
 
-	// Encode the audioData to base64
-	const audioBase64 = audioData
-		? Buffer.from(audioData).toString("base64")
-		: null;
-
 	return (
 		<SharedResults
+			resultId={params.id}
 			allPokemon={allPokemon}
 			teamSummary={teamSummary}
 			trainerName={trainerName || "Unknown Trainer"}
-			audioBase64={audioBase64}
 		/>
 	);
 }
