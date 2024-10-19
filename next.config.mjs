@@ -15,6 +15,11 @@ const nextConfig = {
                 hostname: "poke-assessment.driptrace.io",
                 pathname: "**",
             },
+            {
+                protocol: "https",
+                hostname: "i.imgur.com",
+                pathname: "**"
+            }
         ]
     }
 }

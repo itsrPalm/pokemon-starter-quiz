@@ -24,6 +24,7 @@ import { Prisma } from "@prisma/client";
 export interface Pokemon extends Prisma.JsonObject {
 	name: string;
 	description: string;
-	detailedDescription: string[];
+	// detailedDescription: string[];
+	traits: string[];
 	image: string | null;
 }

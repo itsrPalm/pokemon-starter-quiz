@@ -349,6 +349,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			return NextResponse.json(response, { status: 400 });
 		}
 
+		// const validatePokemonArray = (
+		// 	pokemonArray: Pokemon[],
+		// 	type: string
+		// ): boolean => {
+		// 	if (!Array.isArray(pokemonArray)) {
+		// 		console.error(`${type}Pokemon is not an array.`);
+		// 		return false;
+		// 	}
+		// 	for (const pokemon of pokemonArray) {
+		// 		if (
+		// 			typeof pokemon.name !== "string" ||
+		// 			typeof pokemon.description !== "string" ||
+		// 			!Array.isArray(pokemon.detailedDescription) ||
+		// 			!pokemon.detailedDescription.every(
+		// 				(desc) => typeof desc === "string"
+		// 			) ||
+		// 			(typeof pokemon.image !== "string" &&
+		// 				pokemon.image !== null)
+		// 		) {
+		// 			console.error(`Invalid Pokémon object in ${type}Pokemon.`);
+		// 			return false;
+		// 		}
+		// 	}
+		// 	return true;
+		// };
+
 		const validatePokemonArray = (
 			pokemonArray: Pokemon[],
 			type: string
@@ -361,14 +387,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 				if (
 					typeof pokemon.name !== "string" ||
 					typeof pokemon.description !== "string" ||
-					!Array.isArray(pokemon.detailedDescription) ||
-					!pokemon.detailedDescription.every(
-						(desc) => typeof desc === "string"
+					!Array.isArray(pokemon.traits) ||
+					!pokemon.traits.every(
+						(trait: string) => typeof trait === "string"
 					) ||
 					(typeof pokemon.image !== "string" &&
 						pokemon.image !== null)
 				) {
-					console.error(`Invalid Pokémon object in ${type}Pokemon.`);
+					console.error(
+						`Invalid Pokémon object in ${type}Pokemon. Object details:`,
+						pokemon
+					);
 					return false;
 				}
 			}
