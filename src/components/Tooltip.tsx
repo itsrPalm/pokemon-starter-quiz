@@ -94,10 +94,11 @@
 
 // 			return () => {
 // 				window.removeEventListener("resize", updatePosition);
-// 				window.removeEventListener("scroll", updatePosition, true);
-// 				if (anchorRef.current) {
-// 					observer.unobserve(anchorRef.current);
+// 				const currentAnchor = anchorRef.current; // Store the current value
+// 				if (currentAnchor) {
+// 					observer.unobserve(currentAnchor); // Use the stored value
 // 				}
+// 				window.removeEventListener("scroll", updatePosition, true);
 // 			};
 // 		}
 // 	}, [isVisible, anchorRef, position, toggleVisibility]);
@@ -230,10 +231,11 @@ const Tooltip: React.FC<TooltipProps> = ({
 
 			return () => {
 				window.removeEventListener("resize", updatePosition);
-				window.removeEventListener("scroll", updatePosition, true);
-				if (anchorRef.current) {
-					observer.unobserve(anchorRef.current);
+				const currentAnchor = anchorRef.current; // Store the current value
+				if (currentAnchor) {
+					observer.unobserve(currentAnchor); // Use the stored value
 				}
+				window.removeEventListener("scroll", updatePosition, true);
 			};
 		}
 	}, [isVisible, anchorRef, position, toggleVisibility]);
