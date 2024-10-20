@@ -1,24 +1,45 @@
+// src/components/SharedResults.tsx
+
 "use client";
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { getTypeStyles } from "@/lib/getTypeStyles";
+import { useState, useEffect, useRef } from "react";
+import {
+	FaPlay,
+	FaPause,
+	FaInfoCircle,
+	// FaCrown,
+	FaMedal,
+	FaStar,
+	FaHandsHelping,
+} from "react-icons/fa";
+// import Tooltip from "@/components/Tooltip"; // Import the updated Tooltip component
+import { typeStyles } from "@/lib/typeStyles"; // Import the type styles utility
+import Tooltip from "./Tooltip";
+
+// -------------------------
+// Interfaces
+// -------------------------
 
 interface Pokemon {
 	name: string;
 	image: string | null;
 	description: string;
 	type: "grass" | "fire" | "water";
+	traits: string[];
 }
 
 interface SharedResultsProps {
-	allPokemon: (Pokemon & { type: "grass" | "fire" | "water" })[];
+	allPokemon: Pokemon[];
 	teamSummary: string;
 	trainerName: string;
 	resultId: string;
 }
+
+// -------------------------
+// SharedResults Component
+// -------------------------
 
 export default function SharedResults({
 	allPokemon,
@@ -26,12 +47,39 @@ export default function SharedResults({
 	trainerName,
 	resultId,
 }: SharedResultsProps) {
+	// Audio States
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 	const [audioStatus, setAudioStatus] = useState<string>("pending");
 	const [loadingAudio, setLoadingAudio] = useState<boolean>(true);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+	// Unlock States
+	const [unlockedPokemon, setUnlockedPokemon] = useState<
+		Record<string, boolean>
+	>({});
+
+	// Tooltip States
+	const [hoveredPokemon, setHoveredPokemon] = useState<string | null>(null);
+	const [clickedPokemon, setClickedPokemon] = useState<string | null>(null); // For mobile
+
+	// Refs for each Pokémon's info icon
+	const iconRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+	// Initialize Unlock States
+	useEffect(() => {
+		const initialUnlocked: Record<string, boolean> = {};
+		allPokemon.forEach((pokemon, index) => {
+			if (index < 3) {
+				initialUnlocked[pokemon.name] = true; // Top 3 unlocked by default
+			} else {
+				initialUnlocked[pokemon.name] = false; // Others locked
+			}
+		});
+		setUnlockedPokemon(initialUnlocked);
+	}, [allPokemon]);
+
+	// Fetch Audio Data
 	useEffect(() => {
 		async function fetchAudioData() {
 			try {
@@ -44,10 +92,14 @@ export default function SharedResults({
 				setAudioStatus(data.audioStatus);
 
 				if (data.audioStatus === "completed" && data.audioBase64) {
-					const audioBlob = new Blob(
-						[Buffer.from(data.audioBase64, "base64")],
-						{ type: "audio/mp3" }
-					);
+					// Decode Base64 to binary data using browser-compatible methods
+					const binaryString = atob(data.audioBase64);
+					const len = binaryString.length;
+					const bytes = new Uint8Array(len);
+					for (let i = 0; i < len; i++) {
+						bytes[i] = binaryString.charCodeAt(i);
+					}
+					const audioBlob = new Blob([bytes], { type: "audio/mp3" });
 					const audioUrl = URL.createObjectURL(audioBlob);
 					const audioElement = new Audio(audioUrl);
 					setAudio(audioElement);
@@ -68,8 +120,9 @@ export default function SharedResults({
 		}
 
 		fetchAudioData();
-	}, [resultId, audioStatus]);
+	}, [resultId]);
 
+	// Handle Play/Pause
 	const handlePlay = () => {
 		if (!audio) return;
 
@@ -85,6 +138,7 @@ export default function SharedResults({
 		setIsPlaying(!isPlaying);
 	};
 
+	// Assign Ranks to Pokémon
 	const orderedPokemon = allPokemon.map((pokemon, index) => {
 		let rank = "Can Relate To";
 		if (index < 3) rank = "Your Top Match!";
@@ -92,19 +146,26 @@ export default function SharedResults({
 		return { ...pokemon, rank };
 	});
 
-	const getCardStyle = (rank: string): string => {
+	// Get Card Styles Based on Type
+	const getCardStyle = (type: "grass" | "fire" | "water"): string => {
+		return typeStyles[type].background;
+	};
+
+	// Get Font Size Based on Rank
+	const getFontSize = (rank: string): string => {
 		switch (rank) {
 			case "Your Top Match!":
-				return "w-full";
+				return "text-xl md:text-2xl";
 			case "Runner Up":
-				return "w-9/12 mx-auto";
+				return "text-lg md:text-xl";
 			case "Can Relate To":
-				return "w-6/12 mx-auto";
+				return "text-sm md:text-lg";
 			default:
-				return "w-full";
+				return "text-xl md:text-2xl";
 		}
 	};
 
+	// Define the getImageSize function
 	const getImageSize = (rank: string): number => {
 		switch (rank) {
 			case "Your Top Match!":
@@ -118,18 +179,43 @@ export default function SharedResults({
 		}
 	};
 
-	const getFontSize = (rank: string): string => {
-		switch (rank) {
-			case "Your Top Match!":
-				return "text-2xl";
-			case "Runner Up":
-				return "text-lg";
-			case "Can Relate To":
-				return "text-sm";
-			default:
-				return "text-2xl";
-		}
+	// Handle Unlock
+	const handleUnlock = (pokemonName: string) => {
+		setUnlockedPokemon((prev) => ({
+			...prev,
+			[pokemonName]: true,
+		}));
 	};
+
+	// Toggle Tooltip Visibility on Click (for Mobile)
+	const toggleTooltip = (pokemonName: string) => {
+		setClickedPokemon((prev) =>
+			prev === pokemonName ? null : pokemonName
+		);
+	};
+
+	// Close Tooltip when clicking outside (for Mobile)
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			Object.keys(iconRefs.current).forEach((pokemonName) => {
+				const iconElement = iconRefs.current[pokemonName];
+				if (
+					iconElement &&
+					!iconElement.contains(event.target as Node)
+				) {
+					setClickedPokemon(null);
+				}
+			});
+		};
+
+		if (clickedPokemon) {
+			document.addEventListener("mousedown", handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [clickedPokemon]);
 
 	return (
 		<div className="min-h-screen w-full bg-gradient-to-b from-blue-100 to-purple-100">
@@ -138,13 +224,14 @@ export default function SharedResults({
 					{trainerName}&apos;s Pokémon Starters
 				</h1>
 
+				{/* Audio Controls */}
 				{loadingAudio ? (
 					<p className="text-center">Loading audio...</p>
 				) : audioStatus === "completed" && audio ? (
 					<div className="flex flex-col items-center mb-6">
 						<motion.button
 							onClick={handlePlay}
-							className="focus:outline-none bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+							className="focus:outline-none bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center"
 							whileTap={{ scale: 0.95 }}
 							aria-label={
 								isPlaying ? "Pause Audio" : "Play Audio"
@@ -160,12 +247,14 @@ export default function SharedResults({
 					<p className="text-center">Audio is not available.</p>
 				)}
 
+				{/* Error Message */}
 				{errorMessage && (
 					<p className="text-red-500 text-center my-4">
 						{errorMessage}
 					</p>
 				)}
 
+				{/* Team Summary */}
 				<motion.div
 					initial={{ opacity: 0, y: 50 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -178,11 +267,12 @@ export default function SharedResults({
 					<p className="text-gray-800 text-justify">{teamSummary}</p>
 				</motion.div>
 
+				{/* Pokémon Cards */}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
 					{orderedPokemon.map((pokemon, index) => (
 						<div
 							key={index}
-							className={`${getCardStyle(pokemon.rank)} mb-8`}
+							className={`${getCardStyle(pokemon.type)} mb-8`}
 						>
 							<motion.div
 								initial={{ opacity: 0, y: 50 }}
@@ -192,22 +282,72 @@ export default function SharedResults({
 									duration: 0.5,
 									delay: index * 0.1,
 								}}
-								className={`${
-									getTypeStyles(pokemon.type).background
-								} ${
-									getTypeStyles(pokemon.type).border
-								} border shadow-md rounded-lg p-4 flex flex-col items-center h-full`}
+								className={`border shadow-md rounded-lg p-4 flex flex-col items-center h-full relative`}
 							>
+								{/* Info Icon with Tooltip - Only if Unlocked */}
+								{unlockedPokemon[pokemon.name] && (
+									<div
+										className="absolute top-2 right-2 cursor-pointer"
+										ref={(el) => {
+											iconRefs.current[pokemon.name] = el;
+										}}
+										onClick={() =>
+											toggleTooltip(pokemon.name)
+										} // Handle click for mobile
+										onMouseEnter={() =>
+											setHoveredPokemon(pokemon.name)
+										} // Handle hover for desktop
+										onMouseLeave={() =>
+											setHoveredPokemon(null)
+										} // Handle hover out for desktop
+									>
+										<FaInfoCircle
+											className="text-gray-700 text-lg"
+											aria-label="View Traits"
+										/>
+										{/* Tooltip */}
+										<Tooltip
+											content={pokemon.traits}
+											anchorRef={
+												iconRefs.current[pokemon.name]
+													? {
+															current:
+																iconRefs
+																	.current[
+																	pokemon.name
+																],
+													  }
+													: { current: null }
+											}
+											isVisible={
+												hoveredPokemon ===
+													pokemon.name ||
+												clickedPokemon === pokemon.name
+											} // Show on hover or click
+											toggleVisibility={() =>
+												toggleTooltip(pokemon.name)
+											} // Pass the toggle function
+										/>
+									</div>
+								)}
+
+								{/* Pokémon Image */}
 								<Image
 									src={
 										pokemon.image ||
 										"/placeholder-pokemon.png"
 									}
 									alt={pokemon.name || "Pokemon"}
-									className="rounded-md"
+									className={`rounded-md ${
+										!unlockedPokemon[pokemon.name]
+											? "blur-sm"
+											: ""
+									}`}
 									width={getImageSize(pokemon.rank)}
 									height={getImageSize(pokemon.rank)}
 								/>
+
+								{/* Pokémon Name */}
 								<h2
 									className={`${getFontSize(
 										pokemon.rank
@@ -215,22 +355,62 @@ export default function SharedResults({
 								>
 									{pokemon.name}
 								</h2>
-								<p
-									className={`${
-										pokemon.rank === "Can Relate To"
-											? "text-xs"
-											: "text-sm"
-									} text-center text-gray-700 mt-2`}
-								>
-									{pokemon.description}
-								</p>
+
+								{/* Pokémon Description or Unlock Button */}
+								<div className="text-center mt-2">
+									{unlockedPokemon[pokemon.name] ? (
+										<p
+											className={`${
+												pokemon.rank === "Can Relate To"
+													? "text-xs"
+													: "text-sm"
+											} text-gray-700`}
+										>
+											{pokemon.description}
+										</p>
+									) : (
+										<motion.button
+											onClick={() =>
+												handleUnlock(pokemon.name)
+											}
+											className="px-4 py-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm"
+											whileTap={{ scale: 0.95 }}
+											aria-label={`Unlock ${pokemon.name}`}
+										>
+											Unlock
+										</motion.button>
+									)}
+								</div>
+
+								{/* Pokémon Rank with Icon */}
 								<span
 									className={`${
 										pokemon.rank === "Can Relate To"
 											? "text-xs"
 											: "text-sm"
-									} font-bold text-purple-600 mt-auto`}
+									} font-bold mt-auto flex items-center ${
+										typeStyles[pokemon.type].text
+									}`}
 								>
+									{/* Insert corresponding icon based on rank */}
+									{pokemon.rank === "Your Top Match!" && (
+										<FaStar
+											className="mr-1"
+											aria-label="Top Match Icon"
+										/>
+									)}
+									{pokemon.rank === "Runner Up" && (
+										<FaMedal
+											className="mr-1"
+											aria-label="Runner Up Icon"
+										/>
+									)}
+									{pokemon.rank === "Can Relate To" && (
+										<FaHandsHelping
+											className="mr-1"
+											aria-label="Can Relate To Icon"
+										/>
+									)}
 									{pokemon.rank}
 								</span>
 							</motion.div>

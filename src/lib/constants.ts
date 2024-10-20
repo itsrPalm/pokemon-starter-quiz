@@ -16,7 +16,7 @@ export interface PokemonGroup {
 }
 
 export type Stage = "start" | "grass" | "fire" | "water" | "result";
-export type SubStage = 1 | 2 | 3;
+export type SubStage = 1 | 2 | 3 | 4;
 
 export const firePokemonGroups: PokemonGroup[] = [
 	{
