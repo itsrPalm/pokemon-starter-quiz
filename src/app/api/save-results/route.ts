@@ -434,9 +434,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 		const fullText = `${trainerName}'s Pokémon Starter Team.\n\n${teamSummary}`;
 
 		// Trigger audio processing asynchronously without blocking
-		const baseUrl =
-			process.env.BASE_URL ||
-			`http://localhost:${process.env.PORT || 3000}`;
+		// const baseUrl =
+		// 	process.env.BASE_URL ||
+		// 	`http://localhost:${process.env.PORT || 3000}`;
+		const baseUrl = `${process.env.BASE_URL}`;
 		console.log(
 			`Triggering audio processing at ${baseUrl}/api/process-pending-audios`
 		);

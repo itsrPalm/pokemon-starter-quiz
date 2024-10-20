@@ -1,0 +1,2 @@
+OPENAI_API_KEY="sk-proj-XtvuoN9Q1UIk2MatBD8hT3BlbkFJd6HVaQ6vZtwvRBXiey9m"
+DATABASE_URL="file:./dev.db"
