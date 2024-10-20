@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model QuizResult {
+//   id           String   @id @default(cuid())
+//   createdAt    DateTime @default(now())
+//   trainerName  String?
+//   grassPokemon Json
+//   firePokemon  Json
+//   waterPokemon Json
+//   teamSummary  String
+//   audioData    Bytes?
+//   audioStatus  String   @default("pending")
+// }
+
+
 model QuizResult {
   id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
@@ -17,4 +30,5 @@ model QuizResult {
   teamSummary  String
   audioData    Bytes?
   audioStatus  String   @default("pending")
+  rankings     Json?
 }
