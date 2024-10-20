@@ -1521,60 +1521,60 @@ const PokemonCard = ({
 	);
 };
 
-const PokemonResults = ({
-	getWinners,
-}: {
-	getWinners: () => {
-		grass: Pokemon[];
-		fire: Pokemon[];
-		water: Pokemon[];
-	};
-}) => {
-	const winners = getWinners();
-	const types = ["grass", "fire", "water"] as const;
-	const ranks = ["Your Top Match!", "Runner Up", "Can Relate To"] as const;
+// const PokemonResults = ({
+// 	getWinners,
+// }: {
+// 	getWinners: () => {
+// 		grass: Pokemon[];
+// 		fire: Pokemon[];
+// 		water: Pokemon[];
+// 	};
+// }) => {
+// 	const winners = getWinners();
+// 	const types = ["grass", "fire", "water"] as const;
+// 	const ranks = ["Your Top Match!", "Runner Up", "Can Relate To"] as const;
 
-	type PokemonResultItem = {
-		pokemon: Pokemon;
-		type: (typeof types)[number];
-		rank: (typeof ranks)[number];
-	};
+// 	type PokemonResultItem = {
+// 		pokemon: Pokemon;
+// 		type: (typeof types)[number];
+// 		rank: (typeof ranks)[number];
+// 	};
 
-	const orderedPokemon: PokemonResultItem[] = ranks.flatMap((rank) =>
-		types
-			.map((type) => {
-				const pokemonForRank = winners[type].find(
-					(_, index) =>
-						(rank === "Your Top Match!" && index === 0) ||
-						(rank === "Runner Up" && index === 1) ||
-						(rank === "Can Relate To" && index === 2)
-				);
-				return pokemonForRank
-					? { pokemon: pokemonForRank, type, rank }
-					: null;
-			})
-			.filter((item): item is PokemonResultItem => item !== null)
-	);
+// 	const orderedPokemon: PokemonResultItem[] = ranks.flatMap((rank) =>
+// 		types
+// 			.map((type) => {
+// 				const pokemonForRank = winners[type].find(
+// 					(_, index) =>
+// 						(rank === "Your Top Match!" && index === 0) ||
+// 						(rank === "Runner Up" && index === 1) ||
+// 						(rank === "Can Relate To" && index === 2)
+// 				);
+// 				return pokemonForRank
+// 					? { pokemon: pokemonForRank, type, rank }
+// 					: null;
+// 			})
+// 			.filter((item): item is PokemonResultItem => item !== null)
+// 	);
 
-	return (
-		<div className="w-full max-w-6xl mx-auto">
-			<h2 className="text-3xl font-bold text-center mb-8 text-purple-900">
-				Your Pokémon Starters Are:
-			</h2>
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-				{orderedPokemon.map(({ pokemon, type, rank }, index) => (
-					<PokemonCard
-						key={`${type}-${rank}-${index}`}
-						pokemon={pokemon}
-						type={type}
-						rank={rank}
-						isLocked={rank !== "Your Top Match!"}
-					/>
-				))}
-			</div>
-		</div>
-	);
-};
+// 	return (
+// 		<div className="w-full max-w-6xl mx-auto">
+// 			<h2 className="text-3xl font-bold text-center mb-8 text-purple-900">
+// 				Your Pokémon Starters Are:
+// 			</h2>
+// 			<div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+// 				{orderedPokemon.map(({ pokemon, type, rank }, index) => (
+// 					<PokemonCard
+// 						key={`${type}-${rank}-${index}`}
+// 						pokemon={pokemon}
+// 						type={type}
+// 						rank={rank}
+// 						isLocked={rank !== "Your Top Match!"}
+// 					/>
+// 				))}
+// 			</div>
+// 		</div>
+// 	);
+// };
 
 export default function QuizPage() {
 	const [stage, setStage] = useState<Stage>("start");
