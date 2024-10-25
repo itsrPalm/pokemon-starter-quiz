@@ -9,8 +9,9 @@ const prisma = new PrismaClient();
 const clientId = process.env.PRINTFUL_CLIENT_ID as string;
 const clientSecret = process.env.PRINTFUL_SECRET_KEY as string;
 
-export async function POST(req: NextRequest) {
+export async function POST(req_: NextRequest) {
 	try {
+		console.log("INIT REQUEST:\n", req_);
 		// Get client credentials token
 		const response = await axios.post(
 			"https://www.printful.com/oauth/token",

@@ -1101,10 +1101,10 @@ interface PrintfulFile {
 
 interface PrintfulResponse {
 	code?: number;
-	result?: any;
+	result?: string;
 	data?: PrintfulFile;
-	extra?: any[];
-	[key: string]: any;
+	extra?: PrintfulFile[];
+	[key: string]: unknown;
 }
 
 export class PrintfulClient {

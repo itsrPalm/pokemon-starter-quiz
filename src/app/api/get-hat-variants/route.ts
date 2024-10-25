@@ -9448,34 +9448,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import Stripe from "stripe";
 import sharp from "sharp";
-import { getPrintfulClient } from "@/lib/printful/printful-auth";
+// import { getPrintfulClient } from "@/lib/printful/printful-auth";
 
-interface PrintfulFile {
-	id: number;
-	url: string;
-	hash: string | null;
-	filename: string;
-	mime_type: string | null;
-	size: number;
-	width: number | null;
-	height: number | null;
-	dpi: number | null;
-	status: "waiting" | "processing" | "accepted" | "rejected" | "failed";
-	created: string;
-	thumbnail_url: string | null;
-	preview_url: string | null;
-	visible: boolean;
-	is_temporary: boolean;
-	_links: {
-		self: { href: string };
-	};
-}
+// interface PrintfulFile {
+// 	id: number;
+// 	url: string;
+// 	hash: string | null;
+// 	filename: string;
+// 	mime_type: string | null;
+// 	size: number;
+// 	width: number | null;
+// 	height: number | null;
+// 	dpi: number | null;
+// 	status: "waiting" | "processing" | "accepted" | "rejected" | "failed";
+// 	created: string;
+// 	thumbnail_url: string | null;
+// 	preview_url: string | null;
+// 	visible: boolean;
+// 	is_temporary: boolean;
+// 	_links: {
+// 		self: { href: string };
+// 	};
+// }
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
 

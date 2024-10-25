@@ -147,7 +147,7 @@ const getAccessCode = async (): Promise<string> => {
 				return await getRefreshedCode(refreshToken);
 			} catch (error) {
 				console.log(
-					"Refresh token failed, falling back to client credentials"
+					`Refresh token failed, falling back to client credentials:\n${error}`
 				);
 				return getClientCredentialsToken();
 			}

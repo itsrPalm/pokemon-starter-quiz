@@ -434,7 +434,7 @@ const orderedDither = (
 					(matrixSize * matrixSize)) *
 				255;
 
-			let adjustedColor = [
+			const adjustedColor = [
 				oldColor[0] + (threshold - 127.5) * strength,
 				oldColor[1] + (threshold - 127.5) * strength,
 				oldColor[2] + (threshold - 127.5) * strength,
