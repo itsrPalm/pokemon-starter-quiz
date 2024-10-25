@@ -1,0 +1,227 @@
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 00:32:59"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 00:33:00"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 00:33:00"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 00:33:00"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 00:33:00"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 00:33:17"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 00:33:17"}
+{"level":"info","message":"Resolver: Query 'products' called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 00:33:17"}
+{"level":"info","message":"Resolver: Performing search with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 00:33:17"}
+{"level":"info","message":"ProductCatalogProcessor: findRelevantProducts called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 00:33:17"}
+{"level":"info","message":"ProductCatalogProcessor: Performing similarity search","service":"product-service","timestamp":"2024-10-22 00:33:17"}
+{"level":"info","message":"ProductCatalogProcessor: Similarity search returned 10 results","service":"product-service","timestamp":"2024-10-22 00:33:18"}
+{"level":"info","message":"ProductCatalogProcessor: Invoking AI model with prompt","service":"product-service","timestamp":"2024-10-22 00:33:18"}
+{"level":"info","message":"ProductCatalogProcessor: AI model invocation completed","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"ProductCatalogProcessor: Response is an AIMessageChunk with content","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitizing JSON content","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"ProductCatalogProcessor: JSON content sanitized","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"ProductCatalogProcessor: Parsing JSON content","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"ProductCatalogProcessor: Parsed 1 products","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitized products to ensure non-null descriptions","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"Resolver: Search completed with 1 results","service":"product-service","timestamp":"2024-10-22 00:33:21"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 00:36:57"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 00:36:59"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 00:36:59"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 00:36:59"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 00:36:59"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"Resolver: Query 'products' called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"Resolver: Performing search with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"ProductCatalogProcessor: findRelevantProducts called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"ProductCatalogProcessor: Performing similarity search","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"ProductCatalogProcessor: Similarity search returned 10 results","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"ProductCatalogProcessor: Invoking AI model with prompt","service":"product-service","timestamp":"2024-10-22 00:37:18"}
+{"level":"info","message":"ProductCatalogProcessor: AI model invocation completed","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"ProductCatalogProcessor: Response is an AIMessageChunk with content","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitizing JSON content","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"ProductCatalogProcessor: JSON content sanitized","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"ProductCatalogProcessor: Parsing JSON content","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"ProductCatalogProcessor: Parsed 10 products","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitized products to ensure non-null descriptions and IDs","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"Resolver: Search completed with 10 results","service":"product-service","timestamp":"2024-10-22 00:37:28"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 00:59:52"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 00:59:55"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 00:59:55"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 00:59:56"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 00:59:56"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:00:13"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:00:13"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 01:06:27"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 01:06:28"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 01:06:28"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 01:06:29"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 01:06:29"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:06:49"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:06:49"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 01:10:16"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 01:10:17"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 01:10:17"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 01:10:18"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 01:10:18"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:10:34"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:10:34"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:10:59"}
+{"level":"info","message":"ProductCatalogProcessor: Initialization already in progress","service":"product-service","timestamp":"2024-10-22 01:10:59"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:10:59"}
+{"level":"info","message":"Resolver: Query 'products' called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:10:59"}
+{"level":"info","message":"Resolver: Performing search with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:10:59"}
+{"level":"info","message":"ProductCatalogProcessor: findRelevantProducts called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:10:59"}
+{"level":"info","message":"ProductCatalogProcessor: Performing similarity search","service":"product-service","timestamp":"2024-10-22 01:10:59"}
+{"level":"info","message":"ProductCatalogProcessor: Similarity search returned 10 results","service":"product-service","timestamp":"2024-10-22 01:11:00"}
+{"level":"info","message":"ProductCatalogProcessor: Invoking AI model with prompt","service":"product-service","timestamp":"2024-10-22 01:11:00"}
+{"level":"info","message":"ProductCatalogProcessor: AI model invocation completed","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"ProductCatalogProcessor: Response is an AIMessageChunk with content","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitizing JSON content","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"ProductCatalogProcessor: JSON content sanitized","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"ProductCatalogProcessor: Parsing JSON content","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"ProductCatalogProcessor: Parsed 10 products","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitized products to ensure non-null descriptions and IDs","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"Resolver: Search completed with 10 results","service":"product-service","timestamp":"2024-10-22 01:11:08"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 01:14:28"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 01:14:30"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 01:14:30"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 01:14:31"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 01:14:31"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:14:47"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:14:47"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 01:16:34"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 01:16:40"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 01:16:40"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 01:16:43"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 01:16:43"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:17:55"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:17:55"}
+{"level":"info","message":"Resolver: Query 'products' called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:17:55"}
+{"level":"info","message":"Resolver: Performing search with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:17:55"}
+{"level":"info","message":"ProductCatalogProcessor: findRelevantProducts called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:17:55"}
+{"level":"info","message":"ProductCatalogProcessor: Performing similarity search","service":"product-service","timestamp":"2024-10-22 01:17:55"}
+{"level":"info","message":"ProductCatalogProcessor: Similarity search returned 10 results","service":"product-service","timestamp":"2024-10-22 01:17:56"}
+{"level":"info","message":"ProductCatalogProcessor: Invoking AI model with prompt","service":"product-service","timestamp":"2024-10-22 01:17:56"}
+{"level":"info","message":"ProductCatalogProcessor: AI model invocation completed","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"ProductCatalogProcessor: Response is an AIMessageChunk with content","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitizing JSON content","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"ProductCatalogProcessor: JSON content sanitized","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"ProductCatalogProcessor: Parsing JSON content","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"ProductCatalogProcessor: Parsed 10 products","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitized products to ensure non-null descriptions and IDs","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"Resolver: Search completed with 10 results","service":"product-service","timestamp":"2024-10-22 01:18:05"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 01:22:28"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 01:22:29"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 01:22:29"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 01:22:30"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 01:22:30"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:22:45"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:22:45"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 01:25:39"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 01:25:39"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 01:25:39"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 01:25:39"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 01:25:39"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:25:40"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 01:25:40"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 01:25:40"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 01:25:42"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 01:25:42"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 01:25:43"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 01:25:43"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:26:02"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:26:02"}
+{"level":"info","message":"Resolver: Query 'products' called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:26:02"}
+{"level":"info","message":"Resolver: Performing search with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:26:02"}
+{"level":"info","message":"ProductCatalogProcessor: findRelevantProducts called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:26:02"}
+{"level":"info","message":"ProductCatalogProcessor: Performing similarity search","service":"product-service","timestamp":"2024-10-22 01:26:02"}
+{"level":"info","message":"ProductCatalogProcessor: Similarity search returned 10 results","service":"product-service","timestamp":"2024-10-22 01:26:03"}
+{"level":"info","message":"ProductCatalogProcessor: Invoking AI model with prompt","service":"product-service","timestamp":"2024-10-22 01:26:03"}
+{"level":"info","message":"ProductCatalogProcessor: AI model invocation completed","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"ProductCatalogProcessor: Response is an AIMessageChunk with content","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitizing JSON content","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"ProductCatalogProcessor: JSON content sanitized","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"ProductCatalogProcessor: Parsing JSON content","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"ProductCatalogProcessor: Parsed 10 products","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitized products to ensure non-null descriptions and IDs","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"Resolver: Search completed with 10 results","service":"product-service","timestamp":"2024-10-22 01:26:12"}
+{"level":"info","message":"API Route: Initializing Prisma Client","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"API Route: Retrieving ProductCatalogProcessor instance","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"API Route: Creating Apollo Server instance","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"API Route: Creating Next.js API route handler with context","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"API Route: Exported POST handler","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"API Route: Initializing ProductCatalogProcessor","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"ProductCatalogProcessor: Starting initialization","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"ProductCatalogProcessor: Loading documents","service":"product-service","timestamp":"2024-10-22 01:41:31"}
+{"level":"info","message":"ProductCatalogProcessor: Loaded 21811 documents","service":"product-service","timestamp":"2024-10-22 01:41:32"}
+{"level":"info","message":"ProductCatalogProcessor: Splitting documents","service":"product-service","timestamp":"2024-10-22 01:41:32"}
+{"level":"info","message":"ProductCatalogProcessor: Split into 21825 chunks","service":"product-service","timestamp":"2024-10-22 01:41:33"}
+{"level":"info","message":"ProductCatalogProcessor: Creating vector store from documents","service":"product-service","timestamp":"2024-10-22 01:41:33"}
+{"level":"info","message":"ProductCatalogProcessor: Vector store created successfully","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"API Route: ProductCatalogProcessor initialized","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"Resolver: Query 'products' called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"Resolver: Performing search with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"ProductCatalogProcessor: findRelevantProducts called with query='shirt' and limit=10","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"ProductCatalogProcessor: Performing similarity search","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"ProductCatalogProcessor: Similarity search returned 10 results","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"ProductCatalogProcessor: Invoking AI model with prompt","service":"product-service","timestamp":"2024-10-22 01:41:49"}
+{"level":"info","message":"ProductCatalogProcessor: AI model invocation completed","service":"product-service","timestamp":"2024-10-22 01:41:58"}
+{"level":"info","message":"ProductCatalogProcessor: Response is an AIMessageChunk with content","service":"product-service","timestamp":"2024-10-22 01:41:58"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitizing JSON content","service":"product-service","timestamp":"2024-10-22 01:41:58"}
+{"level":"info","message":"ProductCatalogProcessor: JSON content sanitized","service":"product-service","timestamp":"2024-10-22 01:41:58"}
+{"level":"info","message":"ProductCatalogProcessor: Parsing JSON content","service":"product-service","timestamp":"2024-10-22 01:41:58"}
+{"level":"info","message":"ProductCatalogProcessor: Parsed 10 products","service":"product-service","timestamp":"2024-10-22 01:41:58"}
+{"level":"info","message":"ProductCatalogProcessor: Sanitized products to ensure non-null descriptions and IDs","service":"product-service","timestamp":"2024-10-22 01:41:58"}
+{"level":"info","message":"Resolver: Search completed with 10 results","service":"product-service","timestamp":"2024-10-22 01:41:58"}

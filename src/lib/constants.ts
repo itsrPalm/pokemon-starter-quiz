@@ -1,8 +1,330 @@
+import type { Stripe } from "stripe";
+
+export type StripeAddress = Stripe.Address;
+export type StripeShippingDetails = Stripe.Checkout.Session.ShippingDetails;
+
+// Make sure it's compatible with Prisma's JSON type
+export type PrismaJsonValue =
+	| string
+	| number
+	| boolean
+	| null
+	| { [key: string]: PrismaJsonValue }
+	| PrismaJsonValue[];
+
+export interface PrismaShippingDetailsAddress {
+	[key: string]: PrismaJsonValue;
+	line1: string | null;
+	line2: string | null;
+	city: string | null;
+	state: string | null;
+	country: string | null;
+	postal_code: string | null;
+}
+
+export interface PrismaShippingDetails {
+	[key: string]: PrismaJsonValue;
+	name: string | null;
+	address: PrismaShippingDetailsAddress | null;
+	phone: string | null;
+}
+
+export interface ShippingAddress {
+	line1?: string;
+	line2?: string;
+	city?: string;
+	state?: string;
+	country?: string;
+	postal_code?: string;
+}
+
+export interface ShippingDetails {
+	name?: string;
+	address?: ShippingAddress;
+	phone?: string;
+}
+
+// src/types/order.ts
+export type OrderStatus = "pending" | "paid" | "processing" | "fulfilled";
+
+export interface OrderShippingDetails {
+	name: string;
+	address: {
+		line1: string;
+		line2?: string;
+		city: string;
+		state: string;
+		country: string;
+		postalCode: string;
+	};
+	phone?: string;
+}
+
+export interface PrintfulProduct {
+	id: number;
+	name: string;
+	description: string;
+	variants: PrintfulVariant[];
+}
+
+export interface PrintfulVariant {
+	id: number;
+	name: string;
+	size: string;
+	color: string;
+	price: string;
+}
+
+// src/lib/constants.ts
+
+// src/types/printful.ts
+
+export interface PrintfulFileResponse {
+	result: {
+		id: string;
+		url: string;
+		// Add other relevant fields as needed
+	};
+	code: number;
+}
+
+export interface PrintfulErrorResponse {
+	code: number;
+	result: string;
+	error: {
+		reason: string;
+		message: string;
+		api_error_code: string;
+		error_url: string;
+	};
+}
+
+export interface GetHatVariantsResponse {
+	variant: HatVariant;
+}
+
+export interface UploadPokemonPngResponse {
+	success: boolean;
+	updatedResult?: string; // Define a specific type if possible
+	error?: string;
+}
+
+export interface CreateCheckoutSessionResponse {
+	url?: string;
+	error?: string;
+}
+
+export interface Variant {
+	id: string;
+	printfulId: number;
+	name: string;
+	size: string | null;
+	color: string | null;
+	printfulPrice: number;
+	retailPrice: number;
+	stripePriceId: string | null;
+	mockupUrl: string | null;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
+export interface HatVariant {
+	id: string;
+	name: string;
+	color: string;
+	size: string;
+	image: string;
+	retailPrice: number;
+	currency: string;
+	stripePriceId: string;
+	pngImages?: Record<string, string>;
+	hatProductId: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
+// export interface HatProduct {
+// 	id: string;
+// 	printfulId: number;
+// 	mainCategoryId: number;
+// 	type: string;
+// 	description: string;
+// 	title: string;
+// 	brand: string;
+// 	model: string;
+// 	image: string;
+// 	variantCount: number;
+// 	currency: string;
+// 	options: PrismaJsonValue;
+// 	techniques: PrismaJsonValue;
+// 	files: PrismaJsonValue;
+// 	hatVariants: HatVariant[];
+// }
+
+// src/types/printful.ts
+
+// export interface Dimensions {
+// 	// Define properties if available. Currently, it's null.
+// 	width: number;
+// 	height: number;
+// 	depth: number;
+// }
+
+// export type OptionType = "radio" | "multi_select" | "text"
+
+// export enum ProductType {
+//     Embroidery = 'EMBROIDERY',
+//     // Add other types as needed
+//   }
+
+//   export enum OptionTypeEnum {
+//     Radio = 'radio',
+//     MultiSelect = 'multi_select',
+//     Text = 'text',
+//   }
+
+//   export enum FileTypeEnum {
+//     EmbroideryFrontLarge = 'embroidery_front_large',
+//     EmbroideryFront = 'embroidery_front',
+//     EmbroideryBack = 'embroidery_back',
+//     EmbroideryRight = 'embroidery_right',
+//     EmbroideryLeft = 'embroidery_left',
+//     Mockup = 'mockup',
+//   }
+
+//   export enum FileOptionTypeEnum {
+//     Bool = 'bool',
+//   }
+//   ;
+
+// export interface PriceBreakdown {
+// 	flat: string;
+// 	"3d": string;
+// 	both: string;
+// }
+
+// export interface Technique {
+// 	key: string;
+// 	display_name: string;
+// 	is_default: boolean;
+// }
+
+// export type FileType =
+// 	| "embroidery_front_large"
+// 	| "embroidery_front"
+// 	| "embroidery_back"
+// 	| "embroidery_right"
+// 	| "embroidery_left"
+// 	| "mockup";
+
+//     export interface Option {
+//         id: string;
+//         title: string;
+//         type: OptionTypeEnum;
+//         values: Record<string, string> | null;
+//         additional_price: string | null;
+//         additional_price_breakdown: PriceBreakdown;
+//       }
+
+//       export interface File {
+//         id: string;
+//         type: FileTypeEnum;
+//         title: string;
+//         additional_price: string | null;
+//         options: FileOption[];
+//       }
+
+//       export interface FileOption {
+//         id: string;
+//         type: FileOptionTypeEnum;
+//         title: string;
+//         additional_price: number;
+//       }
+
+// export type FileOptionType = "bool";
+
+// export interface CustomHatProduct extends HatProduct {
+// 	// Add or override properties specific to custom hats
+// 	customProperty?: string;
+// }
+
+// export interface HatProduct {
+// 	id: number;
+// 	main_category_id: number;
+// 	type: string; // Consider using enums for fixed types
+// 	description: string;
+// 	type_name: string;
+// 	title: string;
+// 	brand: string;
+// 	model: string;
+// 	image: string;
+// 	variant_count: number;
+// 	currency: string;
+// 	options: Option[];
+// 	dimensions: Dimensions | null;
+// 	is_discontinued: boolean;
+// 	avg_fulfillment_time: string | null; // Adjust type based on actual data
+// 	techniques: Technique[];
+// 	files: File[];
+// 	origin_country: string | null;
+// }
+
+// Other interfaces remain unchanged
+
+// export interface HatVariant {
+// 	id: string;
+// 	name: string;
+// 	color: string;
+// 	size: string;
+// 	image: string;
+// 	retailPrice: number;
+// 	currency: string;
+// 	stripePriceId: string;
+// 	pngImages?: Record<string, string>;
+// 	hatProductId: string;
+// 	createdAt: Date;
+// 	updatedAt: Date;
+// }
+
+// export interface HatProduct {
+// 	id: string;
+// 	printfulId: number;
+// 	mainCategoryId: number;
+// 	type: string;
+// 	description: string;
+// 	title: string;
+// 	brand: string;
+// 	model: string;
+// 	image: string;
+// 	variantCount: number;
+// 	currency: string;
+// 	options: PrismaJsonValue;
+// 	techniques: PrismaJsonValue;
+// 	files: PrismaJsonValue;
+// 	hatVariants: HatVariant[];
+// }
+
+// export interface Variant {
+// 	id: string;
+// 	printfulId: number;
+// 	name: string;
+// 	size: string | null;
+// 	color: string | null;
+// 	printfulPrice: number;
+// 	retailPrice: number;
+// 	stripePriceId: string | null;
+// 	mockupUrl: string | null;
+// 	// productId: string;
+// 	createdAt: Date;
+// 	updatedAt: Date;
+// }
+
 export interface Pokemon {
 	name: string;
 	description: string;
 	traits: string[];
 	image: string | null;
+	type: "grass" | "fire" | "water"; // Ensure this is included
 }
 
 export interface Question {
@@ -18,6 +340,33 @@ export interface PokemonGroup {
 export type Stage = "start" | "grass" | "fire" | "water" | "result";
 export type SubStage = 1 | 2 | 3 | 4;
 
+export interface ModalProps {
+	isVisible: boolean;
+	onClose: () => void;
+	children: React.ReactNode;
+}
+
+export interface PokeballProps {
+	isOpen: boolean;
+	children: React.ReactNode;
+	imageSize: number;
+}
+
+// SharedResults state interfaces
+export interface SharedResultsState {
+	isPlaying: boolean;
+	audio: HTMLAudioElement | null;
+	audioStatus: string;
+	loadingAudio: boolean;
+	errorMessage: string | null;
+	unlockedPokemon: Record<string, boolean>;
+	hoveredPokemon: string | null;
+	clickedPokemon: string | null;
+	pngImages: Record<string, string>;
+	isLoadingPng: Record<string, boolean>;
+	currentPngViewing: string | null;
+}
+
 export const firePokemonGroups: PokemonGroup[] = [
 	{
 		pokemons: [
@@ -27,6 +376,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"🔥 Competitive and determined. You love proving yourself, thrive on challenges, and never give up, even when things get tough.",
 				traits: ["Brave and Reliable", "Can be stubborn or tempered"],
 				image: null,
+				type: "fire",
 			},
 			{
 				name: "Tepig",
@@ -37,6 +387,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"Can be stubborn or sensitive",
 				],
 				image: null,
+				type: "fire",
 			},
 			{
 				name: "Fennekin",
@@ -47,6 +398,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"Can seem distant or easily frustrated",
 				],
 				image: null,
+				type: "fire",
 			},
 		],
 		questions: [
@@ -103,6 +455,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"Can be impatient or over competitive",
 				],
 				image: null,
+				type: "fire",
 			},
 			{
 				name: "Torchic",
@@ -113,6 +466,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"Can be impatient and overeager",
 				],
 				image: null,
+				type: "fire",
 			},
 			{
 				name: "Litten",
@@ -123,6 +477,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"Can seem distant or bottle up emotions",
 				],
 				image: null,
+				type: "fire",
 			},
 		],
 		questions: [
@@ -176,6 +531,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"🎩 Mischievous and ambitious. You love trying new things and can bounce back from setbacks with a smile.",
 				traits: ["Playful and Clever", "Can be reckless or distracted"],
 				image: null,
+				type: "fire",
 			},
 			{
 				name: "Fuecoco",
@@ -186,6 +542,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"Can be distracted or unmotivated",
 				],
 				image: null,
+				type: "fire",
 			},
 			{
 				name: "Cyndaquil",
@@ -196,6 +553,7 @@ export const firePokemonGroups: PokemonGroup[] = [
 					"Can be too shy or overwhelmed",
 				],
 				image: null,
+				type: "fire",
 			},
 		],
 		questions: [
@@ -255,6 +613,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can be overconfident or sensitive to criticism",
 				],
 				image: null,
+				type: "water",
 			},
 			{
 				name: "Froakie",
@@ -265,6 +624,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can seem distant or overly self-reliant",
 				],
 				image: null,
+				type: "water",
 			},
 			{
 				name: "Squirtle",
@@ -275,6 +635,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can be reckless or over confident",
 				],
 				image: null,
+				type: "water",
 			},
 		],
 		questions: [
@@ -331,6 +692,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can be impulsive or overly playful",
 				],
 				image: null,
+				type: "water",
 			},
 			{
 				name: "Quaxly",
@@ -341,6 +703,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can be stubborn or self-absorbed",
 				],
 				image: null,
+				type: "water",
 			},
 			{
 				name: "Sobble",
@@ -351,6 +714,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can be too shy or overwhelmed",
 				],
 				image: null,
+				type: "water",
 			},
 		],
 		questions: [
@@ -407,6 +771,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can be self critical or attention-seeking",
 				],
 				image: null,
+				type: "water",
 			},
 			{
 				name: "Piplup",
@@ -417,6 +782,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can seem distant or sensitive to criticism",
 				],
 				image: null,
+				type: "water",
 			},
 			{
 				name: "Mudkip",
@@ -427,6 +793,7 @@ export const waterPokemonGroups: PokemonGroup[] = [
 					"Can be distracted or naive",
 				],
 				image: null,
+				type: "water",
 			},
 		],
 		questions: [
@@ -486,6 +853,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can be Impulsive or distracted",
 				],
 				image: null,
+				type: "grass",
 			},
 			{
 				name: "Chikorita",
@@ -493,6 +861,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"❤️ Kind and gentle. You create peace around you, love helping others, and feel happiest when everyone feels cared for.",
 				traits: ["Gentle and Caring", "Can be too shy or sensitive"],
 				image: null,
+				type: "grass",
 			},
 			{
 				name: "Snivy",
@@ -503,6 +872,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can seem distant or self-absorbed",
 				],
 				image: null,
+				type: "grass",
 			},
 		],
 		questions: [
@@ -559,6 +929,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can be stubborn or easily frustrated",
 				],
 				image: null,
+				type: "grass",
 			},
 			{
 				name: "Turtwig",
@@ -569,6 +940,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can be stubborn or overly cautious",
 				],
 				image: null,
+				type: "grass",
 			},
 			{
 				name: "Rowlet",
@@ -579,6 +951,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can be distracted or overly cautious",
 				],
 				image: null,
+				type: "grass",
 			},
 		],
 		questions: [
@@ -635,6 +1008,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can be distracted or stubborn",
 				],
 				image: null,
+				type: "grass",
 			},
 			{
 				name: "Bulbasaur",
@@ -645,6 +1019,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can be indecisive or overwhelmed",
 				],
 				image: null,
+				type: "grass",
 			},
 			{
 				name: "Treecko",
@@ -655,6 +1030,7 @@ export const grassPokemonGroups: PokemonGroup[] = [
 					"Can seem distant or impatient",
 				],
 				image: null,
+				type: "grass",
 			},
 		],
 		questions: [

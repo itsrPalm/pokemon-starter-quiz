@@ -84,19 +84,38 @@
 
 import { Pokemon } from "@/types/Pokemon";
 
+// export interface SaveResultsRequestBody {
+// 	trainerName: string;
+// 	grassPokemon: Pokemon[];
+// 	firePokemon: Pokemon[];
+// 	waterPokemon: Pokemon[];
+// 	teamSummary: string;
+// 	rankings?: {
+// 		[key in "grass" | "fire" | "water"]?: {
+// 			top: string;
+// 			runnerUp: string;
+// 			canRelate: string;
+// 		};
+// 	};
+// }
+
+// @/types/api.ts
+
 export interface SaveResultsRequestBody {
 	trainerName: string;
 	grassPokemon: Pokemon[];
 	firePokemon: Pokemon[];
 	waterPokemon: Pokemon[];
 	teamSummary: string;
-	rankings?: {
-		[key in "grass" | "fire" | "water"]?: {
-			top: string;
-			runnerUp: string;
-			canRelate: string;
-		};
-	};
+	audioStatus?: string; // Optional if not always sent
+	rankings: Record<
+		string,
+		{ top: string; runnerUp: string; canRelate: string }
+	>; // More specific definition
+	base64ImageMap?: Record<string, string | null>;
+	pokemonResultPngs?: Record<string, string | null>; // More specific definition
+	svgMap?: Record<string, string | null>; // More specific definition
+	hatProductId?: string;
 }
 
 export interface SaveResultsResponse {
