@@ -816,6 +816,7 @@ export async function POST(req: NextRequest) {
 
 		const base64Image = await convertFileToBase64(
 			pokemon.image || "/placeholder-pokemon.png"
+			// "https://us-east.storage.cloudconvert.com/tasks/8c87b37c-7e2b-49bc-bb25-0f9572e48df4/DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241025%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20241025T080408Z&X-Amz-Expires=86400&X-Amz-Signature=521f929cbc92b5a618ded96883fae5924b8560b364265cbbcf3421a03fb07bff&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png%22&response-content-type=image%2Fpng&x-id=GetObject"
 		);
 
 		// Adjust sizes for high DPI rendering, with a max of 300 DPI
