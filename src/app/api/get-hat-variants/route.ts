@@ -8546,7 +8546,7 @@ interface PrintfulFile {
 	};
 }
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
 if (!STRIPE_SECRET_KEY) {
