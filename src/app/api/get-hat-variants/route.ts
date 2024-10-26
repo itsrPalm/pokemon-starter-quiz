@@ -8516,459 +8516,459 @@
 
 //1024x1024
 // still not uploading
-// import { NextRequest, NextResponse } from "next/server";
-// import axios from "axios";
-// import axiosRetry from "axios-retry";
-// import { PrismaClient } from "@prisma/client";
-// import { v4 as uuidv4 } from "uuid";
-// import Stripe from "stripe";
-// import { getPrintfulClient } from "@/lib/printful/printful-auth";
-// import sharp from "sharp";
-
-// interface PrintfulFile {
-// 	id: number;
-// 	url: string;
-// 	hash: string | null;
-// 	filename: string;
-// 	mime_type: string | null;
-// 	size: number;
-// 	width: number | null;
-// 	height: number | null;
-// 	dpi: number | null;
-// 	status: "waiting" | "processing" | "accepted" | "rejected";
-// 	created: string;
-// 	thumbnail_url: string | null;
-// 	preview_url: string | null;
-// 	visible: boolean;
-// 	is_temporary: boolean;
-// 	_links: {
-// 		self: { href: string };
-// 	};
-// }
-
-// const prisma = new PrismaClient();
-// const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-
-// if (!STRIPE_SECRET_KEY) {
-// 	throw new Error("STRIPE_SECRET_KEY is not defined");
-// }
-
-// const stripe = new Stripe(STRIPE_SECRET_KEY, {
-// 	apiVersion: "2024-09-30.acacia",
-// });
-
-// axiosRetry(axios, {
-// 	retries: 3,
-// 	retryDelay: axiosRetry.exponentialDelay,
-// 	retryCondition: (error) => {
-// 		return (
-// 			axiosRetry.isNetworkError(error) ||
-// 			axiosRetry.isRetryableError(error)
-// 		);
-// 	},
-// });
-
-// const THREAD_COLORS = {
-// 	"#FFFFFF": "1801 White",
-// 	"#000000": "1800 Black",
-// 	"#96A1A8": "1718 Grey",
-// 	"#A67843": "1672 Old Gold",
-// 	"#FFCC00": "1951 Gold",
-// 	"#E25C27": "1987 Orange",
-// 	"#CC3366": "1910 Flamingo",
-// 	"#CC3333": "1839 Red",
-// 	"#660000": "1784 Maroon",
-// 	"#333366": "1966 Navy",
-// 	"#005397": "1842 Royal",
-// 	"#3399FF": "1695 Aqua/Teal",
-// 	"#6B5294": "1832 Purple",
-// 	"#01784E": "1751 Kelly Green",
-// 	"#7BA35A": "1848 Kiwi Green",
-// };
-
-// const EMBROIDERY_POSITIONS = {
-// 	front: { id: "embroidery_front", price: 2.95 },
-// 	front_large: { id: "embroidery_front_large", price: 2.95 },
-// 	back: { id: "embroidery_back", price: 2.95 },
-// 	right: { id: "embroidery_right", price: 2.95 },
-// 	left: { id: "embroidery_left", price: 2.95 },
-// };
-
-// const EMBROIDERY_TYPES = {
-// 	flat: { title: "Flat Embroidery", price: 0.0 },
-// 	"3d": { title: "3D Puff", price: 1.5 },
-// 	both: { title: "Partial 3D Puff", price: 1.5 },
-// };
-
-// async function waitForFile(
-// 	client: any,
-// 	fileId: number,
-// 	maxAttempts = 10
-// ): Promise<PrintfulFile> {
-// 	console.log(`Waiting for file ${fileId} to process...`);
-
-// 	for (let i = 0; i < maxAttempts; i++) {
-// 		const response = await client.get(`v2/files/${fileId}`);
-// 		const fileData = response.data;
-
-// 		console.log(`File status check ${i + 1}/${maxAttempts}:`, {
-// 			fileId,
-// 			status: fileData.status,
-// 		});
-
-// 		if (fileData.status === "accepted") {
-// 			return fileData;
-// 		} else if (fileData.status === "rejected") {
-// 			throw new Error("File was rejected by Printful");
-// 		}
-
-// 		await new Promise((resolve) => setTimeout(resolve, 1000));
-// 	}
-
-// 	throw new Error("File processing timed out");
-// }
-
-// function randomizeThreadColors(): string[] {
-// 	const colorKeys = Object.keys(THREAD_COLORS);
-// 	const numberOfColors = Math.floor(Math.random() * 3) + 1;
-// 	const selectedColors = colorKeys
-// 		.sort(() => Math.random() - 0.5)
-// 		.slice(0, numberOfColors);
-
-// 	console.log("Generated random thread colors", {
-// 		numberOfColors,
-// 		selectedColors,
-// 		colorNames: selectedColors.map(
-// 			(color) => THREAD_COLORS[color as keyof typeof THREAD_COLORS]
-// 		),
-// 	});
-
-// 	return selectedColors;
-// }
-
-// function selectRandomEmbroideryType(): string {
-// 	const types = Object.keys(EMBROIDERY_TYPES);
-// 	const selectedType = types[Math.floor(Math.random() * types.length)];
-
-// 	console.log("Selected random embroidery type", {
-// 		selectedType,
-// 		typeDetails:
-// 			EMBROIDERY_TYPES[selectedType as keyof typeof EMBROIDERY_TYPES],
-// 	});
-
-// 	return selectedType;
-// }
-
-// function getRandomEmbroideryPositions(): string[] {
-// 	const positions = Object.keys(EMBROIDERY_POSITIONS);
-// 	const numberOfPositions =
-// 		Math.floor(Math.random() * (positions.length - 1)) + 1;
-// 	const selectedPositions = positions
-// 		.sort(() => Math.random() - 0.5)
-// 		.slice(0, numberOfPositions);
-
-// 	console.log("Generated random embroidery positions", {
-// 		numberOfPositions,
-// 		selectedPositions,
-// 		positionDetails: selectedPositions.map(
-// 			(pos) =>
-// 				EMBROIDERY_POSITIONS[pos as keyof typeof EMBROIDERY_POSITIONS]
-// 		),
-// 	});
-
-// 	return selectedPositions;
-// }
-
-// function generateOptions(): Record<string, string | string[] | null> {
-// 	console.log("Starting options generation");
-
-// 	const selectedOptions: Record<string, string | string[] | null> = {};
-
-// 	const embroideryType = selectRandomEmbroideryType();
-// 	selectedOptions["embroidery_type"] = embroideryType;
-
-// 	if (embroideryType === "flat" || embroideryType === "both") {
-// 		selectedOptions["thread_colors"] = randomizeThreadColors();
-// 	}
-// 	if (embroideryType === "3d" || embroideryType === "both") {
-// 		selectedOptions["thread_colors_3d"] = randomizeThreadColors();
-// 	}
-
-// 	const selectedPositions = getRandomEmbroideryPositions();
-// 	selectedPositions.forEach((position) => {
-// 		const optionKey =
-// 			position === "front_large"
-// 				? embroideryType === "3d"
-// 					? "thread_colors_3d_front_large"
-// 					: "thread_colors_front_large"
-// 				: `thread_colors_${position}`;
-
-// 		selectedOptions[optionKey] = randomizeThreadColors();
-// 	});
-
-// 	selectedOptions["notes"] = "Custom embroidered design";
-
-// 	console.log("Final generated options", { selectedOptions });
-// 	return selectedOptions;
-// }
-
-// function calculateTotalPrice(
-// 	selectedOptions: Record<string, string | string[] | null>
-// ): number {
-// 	let totalPrice = 29.99;
-
-// 	const embroideryType = selectedOptions["embroidery_type"] as string;
-// 	const typePrice =
-// 		EMBROIDERY_TYPES[embroideryType as keyof typeof EMBROIDERY_TYPES].price;
-// 	totalPrice += typePrice;
-
-// 	let positionPrices = 0;
-// 	Object.keys(selectedOptions).forEach((key) => {
-// 		if (key.startsWith("thread_colors_") && selectedOptions[key]) {
-// 			const position = key
-// 				.replace("thread_colors_", "")
-// 				.replace("_3d", "");
-// 			if (
-// 				EMBROIDERY_POSITIONS[
-// 					position as keyof typeof EMBROIDERY_POSITIONS
-// 				]
-// 			) {
-// 				positionPrices +=
-// 					EMBROIDERY_POSITIONS[
-// 						position as keyof typeof EMBROIDERY_POSITIONS
-// 					].price;
-// 			}
-// 		}
-// 	});
-
-// 	totalPrice += positionPrices;
-// 	const finalPrice = totalPrice * 2;
-
-// 	console.log("Calculated total price", {
-// 		basePrice: 29.99,
-// 		embroideryTypePrice: typePrice,
-// 		positionPrices,
-// 		finalPrice,
-// 	});
-
-// 	return finalPrice;
-// }
-
-// function getSelectedColorNames(
-// 	selectedOptions: Record<string, string | string[] | null>
-// ): string {
-// 	const colorSet = new Set<string>();
-
-// 	Object.entries(selectedOptions)
-// 		.filter(([key]) => key.includes("thread_colors"))
-// 		.forEach(([_, colors]) => {
-// 			if (Array.isArray(colors)) {
-// 				colors.forEach((color) => {
-// 					const colorName =
-// 						THREAD_COLORS[color as keyof typeof THREAD_COLORS];
-// 					if (colorName) colorSet.add(colorName);
-// 				});
-// 			}
-// 		});
-
-// 	const colorNames = Array.from(colorSet).join(", ");
-// 	console.log("Generated color names", { colorNames });
-// 	return colorNames || "Default Colors";
-// }
-
-// async function resizeImage(pngBase64: string): Promise<Buffer> {
-// 	const imageBuffer = Buffer.from(pngBase64, "base64");
-// 	const resizedImage = await sharp(imageBuffer)
-// 		.resize(1024, 1024)
-// 		.toFormat("png")
-// 		.toBuffer();
-
-// 	// Log the metadata to confirm the size
-// 	const metadata = await sharp(resizedImage).metadata();
-// 	console.log("Resized Image Metadata:", {
-// 		width: metadata.width,
-// 		height: metadata.height,
-// 		size: resizedImage.length,
-// 		format: metadata.format,
-// 	});
-
-// 	return resizedImage;
-// }
-
-// async function processAndUploadImage(pngBase64: string): Promise<string> {
-// 	try {
-// 		console.log("Starting image processing");
-// 		const resizedBuffer = await resizeImage(pngBase64);
-// 		const filename = `hat_variant_${uuidv4()}.png`;
-// 		console.log("Uploading image", { filename });
-
-// 		const uploadResponse = await axios.post(
-// 			`${process.env.NEXT_PUBLIC_BASE_URL}/api/images/upload`,
-// 			{ pngBase64: resizedBuffer.toString("base64"), filename },
-// 			{ headers: { "Content-Type": "application/json" } }
-// 		);
-
-// 		console.log("Image upload successful", {
-// 			url: uploadResponse.data.url,
-// 		});
-// 		return uploadResponse.data.url;
-// 	} catch (error) {
-// 		console.error("Image processing failed:", error);
-// 		throw error;
-// 	}
-// }
-
-// async function uploadToPrintful(
-// 	imageUrl: string
-// ): Promise<{ id: number; url: string }> {
-// 	console.log("Starting Printful upload", { imageUrl });
-
-// 	try {
-// 		const printfulClient = await getPrintfulClient();
-// 		const filename = `hat_variant_${uuidv4()}.png`;
-
-// 		const payload = {
-// 			role: "printfile",
-// 			url: imageUrl,
-// 			filename,
-// 			visible: true,
-// 		};
-
-// 		console.log("Sending request to Printful", { payload });
-
-// 		const response = await printfulClient.post("v2/files", payload);
-// 		console.log("Printful raw response:", response);
-
-// 		if (!response || !response.data) {
-// 			throw new Error("Invalid response from Printful API");
-// 		}
-
-// 		const fileData = response.data;
-// 		console.log("Initial file data:", fileData);
-
-// 		if (fileData.status === "waiting" || fileData.status === "processing") {
-// 			console.log("Waiting for file to be processed...");
-// 			const processedFile = await waitForFile(
-// 				printfulClient,
-// 				fileData.id
-// 			);
-// 			return {
-// 				id: processedFile.id,
-// 				url: processedFile.preview_url || imageUrl,
-// 			};
-// 		}
-
-// 		return {
-// 			id: fileData.id,
-// 			url: fileData.preview_url || imageUrl,
-// 		};
-// 	} catch (error) {
-// 		console.error("Printful upload failed:", {
-// 			error,
-// 			errorMessage:
-// 				error instanceof Error ? error.message : "Unknown error",
-// 			errorStack: error instanceof Error ? error.stack : undefined,
-// 		});
-// 		throw error;
-// 	}
-// }
-
-// export async function POST(req: NextRequest) {
-// 	const requestId = uuidv4();
-// 	console.log(`Starting hat variant generation request ${requestId}`);
-
-// 	try {
-// 		const { resultId, pngBase64, pokemonName } = await req.json();
-// 		console.log("Received request parameters", {
-// 			requestId,
-// 			resultId,
-// 			pokemonName,
-// 			pngBase64Length: pngBase64?.length,
-// 		});
-
-// 		if (!resultId || !pngBase64) {
-// 			return NextResponse.json(
-// 				{ error: "Missing required parameters" },
-// 				{ status: 400 }
-// 			);
-// 		}
-
-// 		const imageUrl = await processAndUploadImage(pngBase64);
-// 		console.log("Image upload completed", { requestId, imageUrl });
-
-// 		const { id: printfulFileId, url: printfulUrl } = await uploadToPrintful(
-// 			imageUrl
-// 		);
-// 		console.log("Printful upload completed", {
-// 			requestId,
-// 			printfulFileId,
-// 			printfulUrl,
-// 		});
-
-// 		const selectedOptions = generateOptions();
-// 		const finalRetailPrice = calculateTotalPrice(selectedOptions);
-// 		const variantName = `${
-// 			pokemonName || "Custom Pokemon"
-// 		} Hat with Embroidery`;
-
-// 		const stripeProduct = await stripe.products.create({
-// 			name: variantName,
-// 			description: "Custom embroidered Pokemon-inspired hat",
-// 			images: [printfulUrl],
-// 		});
-
-// 		const stripePrice = await stripe.prices.create({
-// 			product: stripeProduct.id,
-// 			unit_amount: Math.round(finalRetailPrice * 100),
-// 			currency: "usd",
-// 		});
-
-// 		const variantData = {
-// 			id: uuidv4(),
-// 			printfulFileId,
-// 			name: variantName,
-// 			color: getSelectedColorNames(selectedOptions),
-// 			size: "M",
-// 			image: printfulUrl,
-// 			retailPrice: finalRetailPrice,
-// 			currency: "USD",
-// 			stripePriceId: stripePrice.id,
-// 			selectedOptions,
-// 			createdAt: new Date(),
-// 			updatedAt: new Date(),
-// 		};
-
-// 		console.log("Created variant data", {
-// 			requestId,
-// 			variantId: variantData.id,
-// 			variantName: variantData.name,
-// 			options: variantData.selectedOptions,
-// 		});
-
-// 		return NextResponse.json({ variant: variantData }, { status: 200 });
-// 	} catch (error) {
-// 		console.error(`Request ${requestId} failed:`, error);
-
-// 		if (axios.isAxiosError(error)) {
-// 			return NextResponse.json(
-// 				{
-// 					error: "Failed to generate hat variant.",
-// 					details: error.response?.data,
-// 				},
-// 				{ status: error.response?.status || 500 }
-// 			);
-// 		} else {
-// 			return NextResponse.json(
-// 				{
-// 					error: "Internal Server Error.",
-// 					details:
-// 						error instanceof Error ? error.message : String(error),
-// 				},
-// 				{ status: 500 }
-// 			);
-// 		}
-// 	}
-// }
+import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
+import axiosRetry from "axios-retry";
+import { PrismaClient } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
+import Stripe from "stripe";
+import { getPrintfulClient } from "@/lib/printful/printful-auth";
+import sharp from "sharp";
+
+interface PrintfulFile {
+	id: number;
+	url: string;
+	hash: string | null;
+	filename: string;
+	mime_type: string | null;
+	size: number;
+	width: number | null;
+	height: number | null;
+	dpi: number | null;
+	status: "waiting" | "processing" | "accepted" | "rejected";
+	created: string;
+	thumbnail_url: string | null;
+	preview_url: string | null;
+	visible: boolean;
+	is_temporary: boolean;
+	_links: {
+		self: { href: string };
+	};
+}
+
+const prisma = new PrismaClient();
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+
+if (!STRIPE_SECRET_KEY) {
+	throw new Error("STRIPE_SECRET_KEY is not defined");
+}
+
+const stripe = new Stripe(STRIPE_SECRET_KEY, {
+	apiVersion: "2024-09-30.acacia",
+});
+
+axiosRetry(axios, {
+	retries: 3,
+	retryDelay: axiosRetry.exponentialDelay,
+	retryCondition: (error) => {
+		return (
+			axiosRetry.isNetworkError(error) ||
+			axiosRetry.isRetryableError(error)
+		);
+	},
+});
+
+const THREAD_COLORS = {
+	"#FFFFFF": "1801 White",
+	"#000000": "1800 Black",
+	"#96A1A8": "1718 Grey",
+	"#A67843": "1672 Old Gold",
+	"#FFCC00": "1951 Gold",
+	"#E25C27": "1987 Orange",
+	"#CC3366": "1910 Flamingo",
+	"#CC3333": "1839 Red",
+	"#660000": "1784 Maroon",
+	"#333366": "1966 Navy",
+	"#005397": "1842 Royal",
+	"#3399FF": "1695 Aqua/Teal",
+	"#6B5294": "1832 Purple",
+	"#01784E": "1751 Kelly Green",
+	"#7BA35A": "1848 Kiwi Green",
+};
+
+const EMBROIDERY_POSITIONS = {
+	front: { id: "embroidery_front", price: 2.95 },
+	front_large: { id: "embroidery_front_large", price: 2.95 },
+	back: { id: "embroidery_back", price: 2.95 },
+	right: { id: "embroidery_right", price: 2.95 },
+	left: { id: "embroidery_left", price: 2.95 },
+};
+
+const EMBROIDERY_TYPES = {
+	flat: { title: "Flat Embroidery", price: 0.0 },
+	"3d": { title: "3D Puff", price: 1.5 },
+	both: { title: "Partial 3D Puff", price: 1.5 },
+};
+
+async function waitForFile(
+	client: any,
+	fileId: number,
+	maxAttempts = 10
+): Promise<PrintfulFile> {
+	console.log(`Waiting for file ${fileId} to process...`);
+
+	for (let i = 0; i < maxAttempts; i++) {
+		const response = await client.get(`v2/files/${fileId}`);
+		const fileData = response.data;
+
+		console.log(`File status check ${i + 1}/${maxAttempts}:`, {
+			fileId,
+			status: fileData.status,
+		});
+
+		if (fileData.status === "accepted") {
+			return fileData;
+		} else if (fileData.status === "rejected") {
+			throw new Error("File was rejected by Printful");
+		}
+
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+	}
+
+	throw new Error("File processing timed out");
+}
+
+function randomizeThreadColors(): string[] {
+	const colorKeys = Object.keys(THREAD_COLORS);
+	const numberOfColors = Math.floor(Math.random() * 3) + 1;
+	const selectedColors = colorKeys
+		.sort(() => Math.random() - 0.5)
+		.slice(0, numberOfColors);
+
+	console.log("Generated random thread colors", {
+		numberOfColors,
+		selectedColors,
+		colorNames: selectedColors.map(
+			(color) => THREAD_COLORS[color as keyof typeof THREAD_COLORS]
+		),
+	});
+
+	return selectedColors;
+}
+
+function selectRandomEmbroideryType(): string {
+	const types = Object.keys(EMBROIDERY_TYPES);
+	const selectedType = types[Math.floor(Math.random() * types.length)];
+
+	console.log("Selected random embroidery type", {
+		selectedType,
+		typeDetails:
+			EMBROIDERY_TYPES[selectedType as keyof typeof EMBROIDERY_TYPES],
+	});
+
+	return selectedType;
+}
+
+function getRandomEmbroideryPositions(): string[] {
+	const positions = Object.keys(EMBROIDERY_POSITIONS);
+	const numberOfPositions =
+		Math.floor(Math.random() * (positions.length - 1)) + 1;
+	const selectedPositions = positions
+		.sort(() => Math.random() - 0.5)
+		.slice(0, numberOfPositions);
+
+	console.log("Generated random embroidery positions", {
+		numberOfPositions,
+		selectedPositions,
+		positionDetails: selectedPositions.map(
+			(pos) =>
+				EMBROIDERY_POSITIONS[pos as keyof typeof EMBROIDERY_POSITIONS]
+		),
+	});
+
+	return selectedPositions;
+}
+
+function generateOptions(): Record<string, string | string[] | null> {
+	console.log("Starting options generation");
+
+	const selectedOptions: Record<string, string | string[] | null> = {};
+
+	const embroideryType = selectRandomEmbroideryType();
+	selectedOptions["embroidery_type"] = embroideryType;
+
+	if (embroideryType === "flat" || embroideryType === "both") {
+		selectedOptions["thread_colors"] = randomizeThreadColors();
+	}
+	if (embroideryType === "3d" || embroideryType === "both") {
+		selectedOptions["thread_colors_3d"] = randomizeThreadColors();
+	}
+
+	const selectedPositions = getRandomEmbroideryPositions();
+	selectedPositions.forEach((position) => {
+		const optionKey =
+			position === "front_large"
+				? embroideryType === "3d"
+					? "thread_colors_3d_front_large"
+					: "thread_colors_front_large"
+				: `thread_colors_${position}`;
+
+		selectedOptions[optionKey] = randomizeThreadColors();
+	});
+
+	selectedOptions["notes"] = "Custom embroidered design";
+
+	console.log("Final generated options", { selectedOptions });
+	return selectedOptions;
+}
+
+function calculateTotalPrice(
+	selectedOptions: Record<string, string | string[] | null>
+): number {
+	let totalPrice = 29.99;
+
+	const embroideryType = selectedOptions["embroidery_type"] as string;
+	const typePrice =
+		EMBROIDERY_TYPES[embroideryType as keyof typeof EMBROIDERY_TYPES].price;
+	totalPrice += typePrice;
+
+	let positionPrices = 0;
+	Object.keys(selectedOptions).forEach((key) => {
+		if (key.startsWith("thread_colors_") && selectedOptions[key]) {
+			const position = key
+				.replace("thread_colors_", "")
+				.replace("_3d", "");
+			if (
+				EMBROIDERY_POSITIONS[
+					position as keyof typeof EMBROIDERY_POSITIONS
+				]
+			) {
+				positionPrices +=
+					EMBROIDERY_POSITIONS[
+						position as keyof typeof EMBROIDERY_POSITIONS
+					].price;
+			}
+		}
+	});
+
+	totalPrice += positionPrices;
+	const finalPrice = totalPrice * 2;
+
+	console.log("Calculated total price", {
+		basePrice: 29.99,
+		embroideryTypePrice: typePrice,
+		positionPrices,
+		finalPrice,
+	});
+
+	return finalPrice;
+}
+
+function getSelectedColorNames(
+	selectedOptions: Record<string, string | string[] | null>
+): string {
+	const colorSet = new Set<string>();
+
+	Object.entries(selectedOptions)
+		.filter(([key]) => key.includes("thread_colors"))
+		.forEach(([_, colors]) => {
+			if (Array.isArray(colors)) {
+				colors.forEach((color) => {
+					const colorName =
+						THREAD_COLORS[color as keyof typeof THREAD_COLORS];
+					if (colorName) colorSet.add(colorName);
+				});
+			}
+		});
+
+	const colorNames = Array.from(colorSet).join(", ");
+	console.log("Generated color names", { colorNames });
+	return colorNames || "Default Colors";
+}
+
+async function resizeImage(pngBase64: string): Promise<Buffer> {
+	const imageBuffer = Buffer.from(pngBase64, "base64");
+	const resizedImage = await sharp(imageBuffer)
+		.resize(1024, 1024)
+		.toFormat("png")
+		.toBuffer();
+
+	// Log the metadata to confirm the size
+	const metadata = await sharp(resizedImage).metadata();
+	console.log("Resized Image Metadata:", {
+		width: metadata.width,
+		height: metadata.height,
+		size: resizedImage.length,
+		format: metadata.format,
+	});
+
+	return resizedImage;
+}
+
+async function processAndUploadImage(pngBase64: string): Promise<string> {
+	try {
+		console.log("Starting image processing");
+		const resizedBuffer = await resizeImage(pngBase64);
+		const filename = `hat_variant_${uuidv4()}.png`;
+		console.log("Uploading image", { filename });
+
+		const uploadResponse = await axios.post(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/images/upload`,
+			{ pngBase64: resizedBuffer.toString("base64"), filename },
+			{ headers: { "Content-Type": "application/json" } }
+		);
+
+		console.log("Image upload successful", {
+			url: uploadResponse.data.url,
+		});
+		return uploadResponse.data.url;
+	} catch (error) {
+		console.error("Image processing failed:", error);
+		throw error;
+	}
+}
+
+async function uploadToPrintful(
+	imageUrl: string
+): Promise<{ id: number; url: string }> {
+	console.log("Starting Printful upload", { imageUrl });
+
+	try {
+		const printfulClient = await getPrintfulClient();
+		const filename = `hat_variant_${uuidv4()}.png`;
+
+		const payload = {
+			role: "printfile",
+			url: imageUrl,
+			filename,
+			visible: true,
+		};
+
+		console.log("Sending request to Printful", { payload });
+
+		const response = await printfulClient.post("v2/files", payload);
+		console.log("Printful raw response:", response);
+
+		if (!response || !response.data) {
+			throw new Error("Invalid response from Printful API");
+		}
+
+		const fileData = response.data;
+		console.log("Initial file data:", fileData);
+
+		if (fileData.status === "waiting" || fileData.status === "processing") {
+			console.log("Waiting for file to be processed...");
+			const processedFile = await waitForFile(
+				printfulClient,
+				fileData.id
+			);
+			return {
+				id: processedFile.id,
+				url: processedFile.preview_url || imageUrl,
+			};
+		}
+
+		return {
+			id: fileData.id,
+			url: fileData.preview_url || imageUrl,
+		};
+	} catch (error) {
+		console.error("Printful upload failed:", {
+			error,
+			errorMessage:
+				error instanceof Error ? error.message : "Unknown error",
+			errorStack: error instanceof Error ? error.stack : undefined,
+		});
+		throw error;
+	}
+}
+
+export async function POST(req: NextRequest) {
+	const requestId = uuidv4();
+	console.log(`Starting hat variant generation request ${requestId}`);
+
+	try {
+		const { resultId, pngBase64, pokemonName } = await req.json();
+		console.log("Received request parameters", {
+			requestId,
+			resultId,
+			pokemonName,
+			pngBase64Length: pngBase64?.length,
+		});
+
+		if (!resultId || !pngBase64) {
+			return NextResponse.json(
+				{ error: "Missing required parameters" },
+				{ status: 400 }
+			);
+		}
+
+		const imageUrl = await processAndUploadImage(pngBase64);
+		console.log("Image upload completed", { requestId, imageUrl });
+
+		const { id: printfulFileId, url: printfulUrl } = await uploadToPrintful(
+			imageUrl
+		);
+		console.log("Printful upload completed", {
+			requestId,
+			printfulFileId,
+			printfulUrl,
+		});
+
+		const selectedOptions = generateOptions();
+		const finalRetailPrice = calculateTotalPrice(selectedOptions);
+		const variantName = `${
+			pokemonName || "Custom Pokemon"
+		} Hat with Embroidery`;
+
+		const stripeProduct = await stripe.products.create({
+			name: variantName,
+			description: "Custom embroidered Pokemon-inspired hat",
+			images: [printfulUrl],
+		});
+
+		const stripePrice = await stripe.prices.create({
+			product: stripeProduct.id,
+			unit_amount: Math.round(finalRetailPrice * 100),
+			currency: "usd",
+		});
+
+		const variantData = {
+			id: uuidv4(),
+			printfulFileId,
+			name: variantName,
+			color: getSelectedColorNames(selectedOptions),
+			size: "M",
+			image: printfulUrl,
+			retailPrice: finalRetailPrice,
+			currency: "USD",
+			stripePriceId: stripePrice.id,
+			selectedOptions,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
+
+		console.log("Created variant data", {
+			requestId,
+			variantId: variantData.id,
+			variantName: variantData.name,
+			options: variantData.selectedOptions,
+		});
+
+		return NextResponse.json({ variant: variantData }, { status: 200 });
+	} catch (error) {
+		console.error(`Request ${requestId} failed:`, error);
+
+		if (axios.isAxiosError(error)) {
+			return NextResponse.json(
+				{
+					error: "Failed to generate hat variant.",
+					details: error.response?.data,
+				},
+				{ status: error.response?.status || 500 }
+			);
+		} else {
+			return NextResponse.json(
+				{
+					error: "Internal Server Error.",
+					details:
+						error instanceof Error ? error.message : String(error),
+				},
+				{ status: 500 }
+			);
+		}
+	}
+}
 
 // still no uploads
 // import { NextRequest, NextResponse } from "next/server";
@@ -9445,395 +9445,395 @@
 // 	}
 // }
 
-import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
-import axiosRetry from "axios-retry";
-// import { PrismaClient } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
-import Stripe from "stripe";
-import sharp from "sharp";
-// import { getPrintfulClient } from "@/lib/printful/printful-auth";
+// import { NextRequest, NextResponse } from "next/server";
+// import axios from "axios";
+// import axiosRetry from "axios-retry";
+// // import { PrismaClient } from "@prisma/client";
+// import { v4 as uuidv4 } from "uuid";
+// import Stripe from "stripe";
+// import sharp from "sharp";
+// // import { getPrintfulClient } from "@/lib/printful/printful-auth";
 
-// interface PrintfulFile {
-// 	id: number;
-// 	url: string;
-// 	hash: string | null;
-// 	filename: string;
-// 	mime_type: string | null;
-// 	size: number;
-// 	width: number | null;
-// 	height: number | null;
-// 	dpi: number | null;
-// 	status: "waiting" | "processing" | "accepted" | "rejected" | "failed";
-// 	created: string;
-// 	thumbnail_url: string | null;
-// 	preview_url: string | null;
-// 	visible: boolean;
-// 	is_temporary: boolean;
-// 	_links: {
-// 		self: { href: string };
-// 	};
+// // interface PrintfulFile {
+// // 	id: number;
+// // 	url: string;
+// // 	hash: string | null;
+// // 	filename: string;
+// // 	mime_type: string | null;
+// // 	size: number;
+// // 	width: number | null;
+// // 	height: number | null;
+// // 	dpi: number | null;
+// // 	status: "waiting" | "processing" | "accepted" | "rejected" | "failed";
+// // 	created: string;
+// // 	thumbnail_url: string | null;
+// // 	preview_url: string | null;
+// // 	visible: boolean;
+// // 	is_temporary: boolean;
+// // 	_links: {
+// // 		self: { href: string };
+// // 	};
+// // }
+
+// // const prisma = new PrismaClient();
+// const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+// const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
+
+// if (!STRIPE_SECRET_KEY) {
+// 	throw new Error("STRIPE_SECRET_KEY is not defined");
 // }
 
-// const prisma = new PrismaClient();
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
+// if (!PRINTFUL_API_KEY) {
+// 	throw new Error("PRINTFUL_API_KEY is not defined");
+// }
 
-if (!STRIPE_SECRET_KEY) {
-	throw new Error("STRIPE_SECRET_KEY is not defined");
-}
+// const stripe = new Stripe(STRIPE_SECRET_KEY, {
+// 	apiVersion: "2024-09-30.acacia",
+// });
 
-if (!PRINTFUL_API_KEY) {
-	throw new Error("PRINTFUL_API_KEY is not defined");
-}
+// axiosRetry(axios, {
+// 	retries: 3,
+// 	retryDelay: axiosRetry.exponentialDelay,
+// 	retryCondition: (error) => {
+// 		return (
+// 			axiosRetry.isNetworkError(error) ||
+// 			axiosRetry.isRetryableError(error)
+// 		);
+// 	},
+// });
 
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-	apiVersion: "2024-09-30.acacia",
-});
+// // Constants for randomization
+// const THREAD_COLORS = {
+// 	"#FFFFFF": "1801 White",
+// 	"#000000": "1800 Black",
+// 	"#96A1A8": "1718 Grey",
+// 	"#A67843": "1672 Old Gold",
+// 	"#FFCC00": "1951 Gold",
+// 	"#E25C27": "1987 Orange",
+// 	"#CC3366": "1910 Flamingo",
+// 	"#CC3333": "1839 Red",
+// 	"#660000": "1784 Maroon",
+// 	"#333366": "1966 Navy",
+// 	"#005397": "1842 Royal",
+// 	"#3399FF": "1695 Aqua/Teal",
+// 	"#6B5294": "1832 Purple",
+// 	"#01784E": "1751 Kelly Green",
+// 	"#7BA35A": "1848 Kiwi Green",
+// };
 
-axiosRetry(axios, {
-	retries: 3,
-	retryDelay: axiosRetry.exponentialDelay,
-	retryCondition: (error) => {
-		return (
-			axiosRetry.isNetworkError(error) ||
-			axiosRetry.isRetryableError(error)
-		);
-	},
-});
+// const EMBROIDERY_POSITIONS = {
+// 	front: { id: "embroidery_front", price: 2.95 },
+// 	front_large: { id: "embroidery_front_large", price: 2.95 },
+// 	back: { id: "embroidery_back", price: 2.95 },
+// 	right: { id: "embroidery_right", price: 2.95 },
+// 	left: { id: "embroidery_left", price: 2.95 },
+// };
 
-// Constants for randomization
-const THREAD_COLORS = {
-	"#FFFFFF": "1801 White",
-	"#000000": "1800 Black",
-	"#96A1A8": "1718 Grey",
-	"#A67843": "1672 Old Gold",
-	"#FFCC00": "1951 Gold",
-	"#E25C27": "1987 Orange",
-	"#CC3366": "1910 Flamingo",
-	"#CC3333": "1839 Red",
-	"#660000": "1784 Maroon",
-	"#333366": "1966 Navy",
-	"#005397": "1842 Royal",
-	"#3399FF": "1695 Aqua/Teal",
-	"#6B5294": "1832 Purple",
-	"#01784E": "1751 Kelly Green",
-	"#7BA35A": "1848 Kiwi Green",
-};
+// const EMBROIDERY_TYPES = {
+// 	flat: { title: "Flat Embroidery", price: 0.0 },
+// 	"3d": { title: "3D Puff", price: 1.5 },
+// 	both: { title: "Partial 3D Puff", price: 1.5 },
+// };
 
-const EMBROIDERY_POSITIONS = {
-	front: { id: "embroidery_front", price: 2.95 },
-	front_large: { id: "embroidery_front_large", price: 2.95 },
-	back: { id: "embroidery_back", price: 2.95 },
-	right: { id: "embroidery_right", price: 2.95 },
-	left: { id: "embroidery_left", price: 2.95 },
-};
+// // Utility to resize, check DPI, and convert to sRGB color profile
+// async function processImage(pngBase64: string): Promise<Buffer> {
+// 	const imageBuffer = Buffer.from(pngBase64, "base64");
 
-const EMBROIDERY_TYPES = {
-	flat: { title: "Flat Embroidery", price: 0.0 },
-	"3d": { title: "3D Puff", price: 1.5 },
-	both: { title: "Partial 3D Puff", price: 1.5 },
-};
+// 	// Convert the image, ensuring sRGB, setting DPI, and verifying metadata thoroughly
+// 	const processedImage = await sharp(imageBuffer)
+// 		.resize(1024, 1024, {
+// 			fit: "inside",
+// 			withoutEnlargement: true,
+// 		})
+// 		.withMetadata({
+// 			density: 300, // Ensure DPI is set correctly
+// 		})
+// 		.png({ force: true }) // Make sure it is a PNG format
+// 		.toColourspace("srgb")
+// 		.toBuffer();
 
-// Utility to resize, check DPI, and convert to sRGB color profile
-async function processImage(pngBase64: string): Promise<Buffer> {
-	const imageBuffer = Buffer.from(pngBase64, "base64");
+// 	// Validate Metadata
+// 	const metadata = await sharp(processedImage).metadata();
+// 	console.log("Processed Image Metadata:", {
+// 		width: metadata.width,
+// 		height: metadata.height,
+// 		dpi: metadata.density || 150,
+// 		format: metadata.format,
+// 		colorSpace: metadata.space,
+// 		hasAlpha: metadata.hasAlpha,
+// 	});
 
-	// Convert the image, ensuring sRGB, setting DPI, and verifying metadata thoroughly
-	const processedImage = await sharp(imageBuffer)
-		.resize(1024, 1024, {
-			fit: "inside",
-			withoutEnlargement: true,
-		})
-		.withMetadata({
-			density: 300, // Ensure DPI is set correctly
-		})
-		.png({ force: true }) // Make sure it is a PNG format
-		.toColourspace("srgb")
-		.toBuffer();
+// 	// Adjust DPI if needed and ensure no alpha channel
+// 	if (
+// 		!metadata.density ||
+// 		metadata.density < 150 ||
+// 		metadata.density > 300 ||
+// 		metadata.hasAlpha
+// 	) {
+// 		console.warn("Adjusting DPI and removing alpha channel...");
+// 		return sharp(processedImage)
+// 			.withMetadata({ density: 300 })
+// 			.png({ force: true })
+// 			.removeAlpha() // Ensure no transparency is present
+// 			.toBuffer();
+// 	}
 
-	// Validate Metadata
-	const metadata = await sharp(processedImage).metadata();
-	console.log("Processed Image Metadata:", {
-		width: metadata.width,
-		height: metadata.height,
-		dpi: metadata.density || 150,
-		format: metadata.format,
-		colorSpace: metadata.space,
-		hasAlpha: metadata.hasAlpha,
-	});
+// 	return processedImage;
+// }
 
-	// Adjust DPI if needed and ensure no alpha channel
-	if (
-		!metadata.density ||
-		metadata.density < 150 ||
-		metadata.density > 300 ||
-		metadata.hasAlpha
-	) {
-		console.warn("Adjusting DPI and removing alpha channel...");
-		return sharp(processedImage)
-			.withMetadata({ density: 300 })
-			.png({ force: true })
-			.removeAlpha() // Ensure no transparency is present
-			.toBuffer();
-	}
+// function randomizeThreadColors(): string[] {
+// 	const colorKeys = Object.keys(THREAD_COLORS);
+// 	const numberOfColors = Math.floor(Math.random() * 3) + 1;
+// 	const selectedColors = colorKeys
+// 		.sort(() => Math.random() - 0.5)
+// 		.slice(0, numberOfColors);
 
-	return processedImage;
-}
+// 	console.log("Generated random thread colors", {
+// 		numberOfColors,
+// 		selectedColors,
+// 		colorNames: selectedColors.map(
+// 			(color) => THREAD_COLORS[color as keyof typeof THREAD_COLORS]
+// 		),
+// 	});
 
-function randomizeThreadColors(): string[] {
-	const colorKeys = Object.keys(THREAD_COLORS);
-	const numberOfColors = Math.floor(Math.random() * 3) + 1;
-	const selectedColors = colorKeys
-		.sort(() => Math.random() - 0.5)
-		.slice(0, numberOfColors);
+// 	return selectedColors;
+// }
 
-	console.log("Generated random thread colors", {
-		numberOfColors,
-		selectedColors,
-		colorNames: selectedColors.map(
-			(color) => THREAD_COLORS[color as keyof typeof THREAD_COLORS]
-		),
-	});
+// function selectRandomEmbroideryType(): string {
+// 	const types = Object.keys(EMBROIDERY_TYPES);
+// 	const selectedType = types[Math.floor(Math.random() * types.length)];
 
-	return selectedColors;
-}
+// 	console.log("Selected random embroidery type", {
+// 		selectedType,
+// 		typeDetails:
+// 			EMBROIDERY_TYPES[selectedType as keyof typeof EMBROIDERY_TYPES],
+// 	});
 
-function selectRandomEmbroideryType(): string {
-	const types = Object.keys(EMBROIDERY_TYPES);
-	const selectedType = types[Math.floor(Math.random() * types.length)];
+// 	return selectedType;
+// }
 
-	console.log("Selected random embroidery type", {
-		selectedType,
-		typeDetails:
-			EMBROIDERY_TYPES[selectedType as keyof typeof EMBROIDERY_TYPES],
-	});
+// function getRandomEmbroideryPositions(): string[] {
+// 	const positions = Object.keys(EMBROIDERY_POSITIONS);
+// 	const numberOfPositions =
+// 		Math.floor(Math.random() * (positions.length - 1)) + 1;
+// 	const selectedPositions = positions
+// 		.sort(() => Math.random() - 0.5)
+// 		.slice(0, numberOfPositions);
 
-	return selectedType;
-}
+// 	console.log("Generated random embroidery positions", {
+// 		numberOfPositions,
+// 		selectedPositions,
+// 		positionDetails: selectedPositions.map(
+// 			(pos) =>
+// 				EMBROIDERY_POSITIONS[pos as keyof typeof EMBROIDERY_POSITIONS]
+// 		),
+// 	});
 
-function getRandomEmbroideryPositions(): string[] {
-	const positions = Object.keys(EMBROIDERY_POSITIONS);
-	const numberOfPositions =
-		Math.floor(Math.random() * (positions.length - 1)) + 1;
-	const selectedPositions = positions
-		.sort(() => Math.random() - 0.5)
-		.slice(0, numberOfPositions);
+// 	return selectedPositions;
+// }
 
-	console.log("Generated random embroidery positions", {
-		numberOfPositions,
-		selectedPositions,
-		positionDetails: selectedPositions.map(
-			(pos) =>
-				EMBROIDERY_POSITIONS[pos as keyof typeof EMBROIDERY_POSITIONS]
-		),
-	});
+// function generateOptions(): Record<string, string | string[] | null> {
+// 	console.log("Starting options generation");
 
-	return selectedPositions;
-}
+// 	const selectedOptions: Record<string, string | string[] | null> = {};
 
-function generateOptions(): Record<string, string | string[] | null> {
-	console.log("Starting options generation");
+// 	const embroideryType = selectRandomEmbroideryType();
+// 	selectedOptions["embroidery_type"] = embroideryType;
 
-	const selectedOptions: Record<string, string | string[] | null> = {};
+// 	if (embroideryType === "flat" || embroideryType === "both") {
+// 		selectedOptions["thread_colors"] = randomizeThreadColors();
+// 	}
+// 	if (embroideryType === "3d" || embroideryType === "both") {
+// 		selectedOptions["thread_colors_3d"] = randomizeThreadColors();
+// 	}
 
-	const embroideryType = selectRandomEmbroideryType();
-	selectedOptions["embroidery_type"] = embroideryType;
+// 	const selectedPositions = getRandomEmbroideryPositions();
+// 	selectedPositions.forEach((position) => {
+// 		const optionKey =
+// 			position === "front_large"
+// 				? embroideryType === "3d"
+// 					? "thread_colors_3d_front_large"
+// 					: "thread_colors_front_large"
+// 				: `thread_colors_${position}`;
 
-	if (embroideryType === "flat" || embroideryType === "both") {
-		selectedOptions["thread_colors"] = randomizeThreadColors();
-	}
-	if (embroideryType === "3d" || embroideryType === "both") {
-		selectedOptions["thread_colors_3d"] = randomizeThreadColors();
-	}
+// 		selectedOptions[optionKey] = randomizeThreadColors();
+// 	});
 
-	const selectedPositions = getRandomEmbroideryPositions();
-	selectedPositions.forEach((position) => {
-		const optionKey =
-			position === "front_large"
-				? embroideryType === "3d"
-					? "thread_colors_3d_front_large"
-					: "thread_colors_front_large"
-				: `thread_colors_${position}`;
+// 	selectedOptions["notes"] = "Custom embroidered design";
 
-		selectedOptions[optionKey] = randomizeThreadColors();
-	});
+// 	console.log("Final generated options", { selectedOptions });
+// 	return selectedOptions;
+// }
 
-	selectedOptions["notes"] = "Custom embroidered design";
+// async function uploadImageToDatabase(
+// 	imageBuffer: Buffer,
+// 	filename: string
+// ): Promise<string> {
+// 	console.log("Uploading image to database", { filename });
 
-	console.log("Final generated options", { selectedOptions });
-	return selectedOptions;
-}
+// 	const uploadResponse = await axios.post(
+// 		`${process.env.NEXT_PUBLIC_BASE_URL}/api/images/upload`,
+// 		{ pngBase64: imageBuffer.toString("base64"), filename },
+// 		{ headers: { "Content-Type": "application/json" } }
+// 	);
 
-async function uploadImageToDatabase(
-	imageBuffer: Buffer,
-	filename: string
-): Promise<string> {
-	console.log("Uploading image to database", { filename });
+// 	console.log("Image uploaded successfully:", uploadResponse.data.url);
+// 	return uploadResponse.data.url;
+// }
 
-	const uploadResponse = await axios.post(
-		`${process.env.NEXT_PUBLIC_BASE_URL}/api/images/upload`,
-		{ pngBase64: imageBuffer.toString("base64"), filename },
-		{ headers: { "Content-Type": "application/json" } }
-	);
+// async function uploadToPrintful(imageUrl: string) {
+// 	try {
+// 		const payload = {
+// 			role: "printfile",
+// 			url: imageUrl,
+// 			// url: "https://cdn.discordapp.com/attachments/1105210253269794846/1116053118992515184/DripTrace_space_mission_3d_game_demo_in_the_style_of_esoteric_i_e415890a-5454-4692-aac1-a76451f5b023.png?ex=671c7b36&is=671b29b6&hm=224541e534f8c1ea525a876cccf6d30632d64716b8f177a6af64cc868459d979&",
+// 			// url: "https://726a-170-103-80-220.ngrok-free.app/api/images/db120a6a-f773-4ae8-804b-f94a6f02d548",
+// 			// url: "https://media.discordapp.net/attachments/1105210253269794846/1113317930965405696/DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png?ex=671c6b1f&is=671b199f&hm=4168cee46f1a61f8b4e159e99b18b5994ac160e8dff549bd7da36e618f457636&=&format=webp&quality=lossless&width=1302&height=1302",
+// 			// url: "https://us-east.storage.cloudconvert.com/tasks/8c87b37c-7e2b-49bc-bb25-0f9572e48df4/DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241025%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20241025T080408Z&X-Amz-Expires=86400&X-Amz-Signature=521f929cbc92b5a618ded96883fae5924b8560b364265cbbcf3421a03fb07bff&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png%22&response-content-type=image%2Fpng&x-id=GetObject",
+// 			// url: "https://us-east.storage.cloudconvert.com/tasks/192d21f9-0656-4954-88b6-16ec1151193d/hat_variant_2a44d581-1b5e-4114-a6d4-63c7e663ea0b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241025%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20241025T081715Z&X-Amz-Expires=86400&X-Amz-Signature=ce7ca691205b36e4bbe3d675b92edec76d81f1e5ec4de677e6275ffb28a691ee&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22hat_variant_2a44d581-1b5e-4114-a6d4-63c7e663ea0b.png%22&response-content-type=image%2Fpng&x-id=GetObject",
+// 			filename: `hat_variant_${uuidv4()}.png`,
+// 			visible: true,
+// 		};
 
-	console.log("Image uploaded successfully:", uploadResponse.data.url);
-	return uploadResponse.data.url;
-}
+// 		const response = await axios.post(
+// 			"https://api.printful.com/v2/files",
+// 			payload,
+// 			{
+// 				headers: {
+// 					"Content-Type": "application/json",
+// 					Authorization: `Bearer ${PRINTFUL_API_KEY}`,
+// 				},
+// 			}
+// 		);
 
-async function uploadToPrintful(imageUrl: string) {
-	try {
-		const payload = {
-			role: "printfile",
-			url: imageUrl,
-			// url: "https://cdn.discordapp.com/attachments/1105210253269794846/1116053118992515184/DripTrace_space_mission_3d_game_demo_in_the_style_of_esoteric_i_e415890a-5454-4692-aac1-a76451f5b023.png?ex=671c7b36&is=671b29b6&hm=224541e534f8c1ea525a876cccf6d30632d64716b8f177a6af64cc868459d979&",
-			// url: "https://726a-170-103-80-220.ngrok-free.app/api/images/db120a6a-f773-4ae8-804b-f94a6f02d548",
-			// url: "https://media.discordapp.net/attachments/1105210253269794846/1113317930965405696/DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png?ex=671c6b1f&is=671b199f&hm=4168cee46f1a61f8b4e159e99b18b5994ac160e8dff549bd7da36e618f457636&=&format=webp&quality=lossless&width=1302&height=1302",
-			// url: "https://us-east.storage.cloudconvert.com/tasks/8c87b37c-7e2b-49bc-bb25-0f9572e48df4/DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241025%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20241025T080408Z&X-Amz-Expires=86400&X-Amz-Signature=521f929cbc92b5a618ded96883fae5924b8560b364265cbbcf3421a03fb07bff&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png%22&response-content-type=image%2Fpng&x-id=GetObject",
-			// url: "https://us-east.storage.cloudconvert.com/tasks/192d21f9-0656-4954-88b6-16ec1151193d/hat_variant_2a44d581-1b5e-4114-a6d4-63c7e663ea0b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241025%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20241025T081715Z&X-Amz-Expires=86400&X-Amz-Signature=ce7ca691205b36e4bbe3d675b92edec76d81f1e5ec4de677e6275ffb28a691ee&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22hat_variant_2a44d581-1b5e-4114-a6d4-63c7e663ea0b.png%22&response-content-type=image%2Fpng&x-id=GetObject",
-			filename: `hat_variant_${uuidv4()}.png`,
-			visible: true,
-		};
+// 		const { id, status } = response.data.data;
 
-		const response = await axios.post(
-			"https://api.printful.com/v2/files",
-			payload,
-			{
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${PRINTFUL_API_KEY}`,
-				},
-			}
-		);
+// 		if (status === "waiting") {
+// 			let attempts = 0;
+// 			while (attempts < 30) {
+// 				const fileResponse = await axios.get(
+// 					`https://api.printful.com/v2/files/${id}`,
+// 					{
+// 						headers: {
+// 							Authorization: `Bearer ${PRINTFUL_API_KEY}`,
+// 						},
+// 					}
+// 				);
 
-		const { id, status } = response.data.data;
+// 				const fileStatus = fileResponse.data.data.status;
+// 				if (fileStatus === "accepted") {
+// 					console.log(
+// 						"File successfully processed:",
+// 						fileResponse.data.data
+// 					);
+// 					return fileResponse.data.data;
+// 				} else if (
+// 					fileStatus === "failed" ||
+// 					fileStatus === "rejected"
+// 				) {
+// 					console.error(
+// 						"Detailed rejection reason:",
+// 						fileResponse.data
+// 					);
+// 					throw new Error(
+// 						`File was rejected or failed to process by Printful. Please ensure the image meets Printful's requirements.`
+// 					);
+// 				}
 
-		if (status === "waiting") {
-			let attempts = 0;
-			while (attempts < 30) {
-				const fileResponse = await axios.get(
-					`https://api.printful.com/v2/files/${id}`,
-					{
-						headers: {
-							Authorization: `Bearer ${PRINTFUL_API_KEY}`,
-						},
-					}
-				);
+// 				await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds before retrying
+// 				attempts++;
+// 			}
 
-				const fileStatus = fileResponse.data.data.status;
-				if (fileStatus === "accepted") {
-					console.log(
-						"File successfully processed:",
-						fileResponse.data.data
-					);
-					return fileResponse.data.data;
-				} else if (
-					fileStatus === "failed" ||
-					fileStatus === "rejected"
-				) {
-					console.error(
-						"Detailed rejection reason:",
-						fileResponse.data
-					);
-					throw new Error(
-						`File was rejected or failed to process by Printful. Please ensure the image meets Printful's requirements.`
-					);
-				}
+// 			throw new Error(
+// 				"File processing timed out after multiple attempts."
+// 			);
+// 		} else {
+// 			throw new Error(
+// 				'Initial file status is not "waiting", something went wrong.'
+// 			);
+// 		}
+// 	} catch (error) {
+// 		console.error(
+// 			"Printful upload failed:",
+// 			error instanceof Error ? error.message : error
+// 		);
+// 		throw error;
+// 	}
+// }
 
-				await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds before retrying
-				attempts++;
-			}
+// export async function POST(req: NextRequest) {
+// 	const requestId = uuidv4();
+// 	console.log(`Starting hat variant generation request ${requestId}`);
 
-			throw new Error(
-				"File processing timed out after multiple attempts."
-			);
-		} else {
-			throw new Error(
-				'Initial file status is not "waiting", something went wrong.'
-			);
-		}
-	} catch (error) {
-		console.error(
-			"Printful upload failed:",
-			error instanceof Error ? error.message : error
-		);
-		throw error;
-	}
-}
+// 	try {
+// 		const { resultId, pngBase64, pokemonName } = await req.json();
+// 		console.log("Received request parameters", {
+// 			requestId,
+// 			resultId,
+// 			pokemonName,
+// 			pngBase64Length: pngBase64?.length,
+// 		});
 
-export async function POST(req: NextRequest) {
-	const requestId = uuidv4();
-	console.log(`Starting hat variant generation request ${requestId}`);
+// 		if (!resultId || !pngBase64) {
+// 			return NextResponse.json(
+// 				{ error: "Missing required parameters" },
+// 				{ status: 400 }
+// 			);
+// 		}
 
-	try {
-		const { resultId, pngBase64, pokemonName } = await req.json();
-		console.log("Received request parameters", {
-			requestId,
-			resultId,
-			pokemonName,
-			pngBase64Length: pngBase64?.length,
-		});
+// 		const processedImage = await processImage(pngBase64);
+// 		const filename = `hat_variant_${uuidv4()}.png`;
+// 		const imageUrl = await uploadImageToDatabase(processedImage, filename);
 
-		if (!resultId || !pngBase64) {
-			return NextResponse.json(
-				{ error: "Missing required parameters" },
-				{ status: 400 }
-			);
-		}
+// 		const printfulData = await uploadToPrintful(imageUrl);
+// 		console.log("Printful upload completed:", printfulData);
 
-		const processedImage = await processImage(pngBase64);
-		const filename = `hat_variant_${uuidv4()}.png`;
-		const imageUrl = await uploadImageToDatabase(processedImage, filename);
+// 		const selectedOptions = generateOptions();
+// 		const finalRetailPrice = 29.99;
 
-		const printfulData = await uploadToPrintful(imageUrl);
-		console.log("Printful upload completed:", printfulData);
+// 		const stripeProduct = await stripe.products.create({
+// 			name: `${pokemonName || "Custom Pokemon"} Hat with Embroidery`,
+// 			description: "Custom embroidered Pokemon-inspired hat",
+// 			images: [printfulData.url],
+// 		});
 
-		const selectedOptions = generateOptions();
-		const finalRetailPrice = 29.99;
+// 		const stripePrice = await stripe.prices.create({
+// 			product: stripeProduct.id,
+// 			unit_amount: Math.round(finalRetailPrice * 100),
+// 			currency: "usd",
+// 		});
 
-		const stripeProduct = await stripe.products.create({
-			name: `${pokemonName || "Custom Pokemon"} Hat with Embroidery`,
-			description: "Custom embroidered Pokemon-inspired hat",
-			images: [printfulData.url],
-		});
+// 		const variantData = {
+// 			id: uuidv4(),
+// 			printfulFileId: printfulData.id,
+// 			name: `${pokemonName || "Custom Pokemon"} Hat with Embroidery`,
+// 			color: "black",
+// 			size: "M",
+// 			image: printfulData.url,
+// 			retailPrice: finalRetailPrice,
+// 			currency: "USD",
+// 			stripePriceId: stripePrice.id,
+// 			selectedOptions,
+// 			createdAt: new Date(),
+// 			updatedAt: new Date(),
+// 		};
 
-		const stripePrice = await stripe.prices.create({
-			product: stripeProduct.id,
-			unit_amount: Math.round(finalRetailPrice * 100),
-			currency: "usd",
-		});
+// 		console.log("Created variant data", {
+// 			requestId,
+// 			variantId: variantData.id,
+// 			variantName: variantData.name,
+// 			options: variantData.selectedOptions,
+// 		});
 
-		const variantData = {
-			id: uuidv4(),
-			printfulFileId: printfulData.id,
-			name: `${pokemonName || "Custom Pokemon"} Hat with Embroidery`,
-			color: "black",
-			size: "M",
-			image: printfulData.url,
-			retailPrice: finalRetailPrice,
-			currency: "USD",
-			stripePriceId: stripePrice.id,
-			selectedOptions,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		};
-
-		console.log("Created variant data", {
-			requestId,
-			variantId: variantData.id,
-			variantName: variantData.name,
-			options: variantData.selectedOptions,
-		});
-
-		return NextResponse.json({ variant: variantData }, { status: 200 });
-	} catch (error) {
-		console.error(`Request ${requestId} failed:`, error);
-		return NextResponse.json(
-			{
-				error: "Internal Server Error.",
-				details: error instanceof Error ? error.message : String(error),
-			},
-			{ status: 500 }
-		);
-	}
-}
+// 		return NextResponse.json({ variant: variantData }, { status: 200 });
+// 	} catch (error) {
+// 		console.error(`Request ${requestId} failed:`, error);
+// 		return NextResponse.json(
+// 			{
+// 				error: "Internal Server Error.",
+// 				details: error instanceof Error ? error.message : String(error),
+// 			},
+// 			{ status: 500 }
+// 		);
+// 	}
+// }
