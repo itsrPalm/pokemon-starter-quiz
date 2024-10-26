@@ -8519,11 +8519,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import Stripe from "stripe";
 import { getPrintfulClient } from "@/lib/printful/printful-auth";
 import sharp from "sharp";
+import { PrintfulClient } from "@/lib/printful/printful-client";
 
 interface PrintfulFile {
 	id: number;
@@ -8601,7 +8602,7 @@ const EMBROIDERY_TYPES = {
 };
 
 async function waitForFile(
-	client: any,
+	client: PrintfulClient,
 	fileId: number,
 	maxAttempts = 10
 ): Promise<PrintfulFile> {
@@ -8611,15 +8612,19 @@ async function waitForFile(
 		const response = await client.get(`v2/files/${fileId}`);
 		const fileData = response.data;
 
-		console.log(`File status check ${i + 1}/${maxAttempts}:`, {
-			fileId,
-			status: fileData.status,
-		});
+		if (fileData) {
+			console.log(`File status check ${i + 1}/${maxAttempts}:`, {
+				fileId,
+				status: fileData.status,
+			});
 
-		if (fileData.status === "accepted") {
-			return fileData;
-		} else if (fileData.status === "rejected") {
-			throw new Error("File was rejected by Printful");
+			if (fileData.status === "accepted") {
+				return fileData;
+			} else if (fileData.status === "rejected") {
+				throw new Error("File was rejected by Printful");
+			}
+		} else {
+			throw new Error("File data is undefined");
 		}
 
 		await new Promise((resolve) => setTimeout(resolve, 1000));
