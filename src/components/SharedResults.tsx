@@ -2745,6 +2745,184 @@ const SharedResults = ({
 		[]
 	);
 
+	// const handleViewPng = async (pokemon: Pokemon, index: number) => {
+	// 	if (pngImages[pokemon.name]) {
+	// 		try {
+	// 			// First pixelate the existing PNG
+	// 			const pixelatedBase64 = await applyRandomPixelation(
+	// 				pngImages[pokemon.name]
+	// 			);
+
+	// 			// Send pixelated version to generate-pokemon-svg
+	// 			const generateResponse = await fetch(
+	// 				"/api/generate-pokemon-svg",
+	// 				{
+	// 					method: "POST",
+	// 					headers: {
+	// 						"Content-Type": "application/json",
+	// 					},
+	// 					body: JSON.stringify({
+	// 						pokemon,
+	// 						index,
+	// 						pngBase64: pixelatedBase64,
+	// 						hexColor: hexColors[pokemon.type],
+	// 						emoji: typeEmojis[pokemon.type],
+	// 						originalImageSize: getImageSize(index),
+	// 						originalFontSize: getFontSize(index),
+	// 					}),
+	// 				}
+	// 			);
+
+	// 			if (!generateResponse.ok) {
+	// 				throw new Error("Failed to generate SVG");
+	// 			}
+
+	// 			setSelectedPokemon(pokemon);
+	// 			setSelectedPngImage(pixelatedBase64);
+	// 			setIsModalVisible(true);
+	// 			return;
+	// 		} catch (error) {
+	// 			console.error("Error handling PNG:", error);
+	// 			setErrorMessage("Failed to process image. Please try again.");
+	// 			return;
+	// 		}
+	// 	}
+
+	// 	setIsLoadingPng((prev) => ({ ...prev, [pokemon.name]: true }));
+	// 	try {
+	// 		// Try to fetch existing PNG first
+	// 		const response = await fetch("/api/get-pokemon-png", {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 			body: JSON.stringify({
+	// 				resultId,
+	// 				pokemonName: pokemon.name,
+	// 			}),
+	// 		});
+
+	// 		if (response.ok) {
+	// 			const data = await response.json();
+	// 			if (data.pngBase64) {
+	// 				// Store original version
+	// 				setPngImages((prev) => ({
+	// 					...prev,
+	// 					[pokemon.name]: data.pngBase64,
+	// 				}));
+
+	// 				// Pixelate it before sending to generate-pokemon-svg
+	// 				const pixelatedBase64 = await applyRandomPixelation(
+	// 					data.pngBase64
+	// 				);
+
+	// 				// Send pixelated version to generate-pokemon-svg
+	// 				const generateResponse = await fetch(
+	// 					"/api/generate-pokemon-svg",
+	// 					{
+	// 						method: "POST",
+	// 						headers: {
+	// 							"Content-Type": "application/json",
+	// 						},
+	// 						body: JSON.stringify({
+	// 							pokemon,
+	// 							index,
+	// 							pngBase64: pixelatedBase64,
+	// 							hexColor: hexColors[pokemon.type],
+	// 							emoji: typeEmojis[pokemon.type],
+	// 							originalImageSize: getImageSize(index),
+	// 							originalFontSize: getFontSize(index),
+	// 						}),
+	// 					}
+	// 				);
+
+	// 				if (!generateResponse.ok) {
+	// 					throw new Error("Failed to generate SVG");
+	// 				}
+
+	// 				setSelectedPokemon(pokemon);
+	// 				setSelectedPngImage(pixelatedBase64);
+	// 				setIsModalVisible(true);
+	// 				return;
+	// 			}
+	// 		}
+
+	// 		// If no existing PNG, create new one
+	// 		const svgResponse = await fetch("/api/generate-pokemon-svg", {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 			body: JSON.stringify({
+	// 				pokemon,
+	// 				index,
+	// 				hexColor: hexColors[pokemon.type],
+	// 				emoji: typeEmojis[pokemon.type],
+	// 				originalImageSize: getImageSize(index),
+	// 				originalFontSize: getFontSize(index),
+	// 			}),
+	// 		});
+
+	// 		if (!svgResponse.ok) {
+	// 			throw new Error("Failed to generate SVG");
+	// 		}
+
+	// 		const svgText = await svgResponse.text();
+	// 		const svgElement = await sourceToSvg(svgText, {});
+	// 		const image = await svgToImage(svgElement);
+
+	// 		const canvas = document.createElement("canvas");
+	// 		canvas.width = image.width;
+	// 		canvas.height = image.height;
+	// 		const ctx = canvas.getContext("2d");
+	// 		if (!ctx) throw new Error("Failed to get canvas context");
+
+	// 		ctx.drawImage(image, 0, 0);
+	// 		const originalPngBase64 = canvas
+	// 			.toDataURL("image/png")
+	// 			.split(",")[1];
+
+	// 		// Store original version
+	// 		setPngImages((prev) => ({
+	// 			...prev,
+	// 			[pokemon.name]: originalPngBase64,
+	// 		}));
+
+	// 		// Create pixelated version
+	// 		const pixelatedBase64 = await applyRandomPixelation(
+	// 			originalPngBase64
+	// 		);
+
+	// 		// Upload original PNG for future use
+	// 		const uploadResponse = await fetch("/api/upload-pokemon-png", {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 			body: JSON.stringify({
+	// 				resultId,
+	// 				pokemonName: pokemon.name,
+	// 				pngBase64: originalPngBase64,
+	// 			}),
+	// 		});
+
+	// 		if (!uploadResponse.ok) {
+	// 			throw new Error("Failed to upload PNG");
+	// 		}
+
+	// 		setSelectedPokemon(pokemon);
+	// 		setSelectedPngImage(pixelatedBase64);
+	// 		setIsModalVisible(true);
+	// 	} catch (error: unknown) {
+	// 		console.error("Error handling PNG:", error);
+	// 		setErrorMessage(
+	// 			error instanceof Error ? error.message : "Failed to load PNG"
+	// 		);
+	// 	} finally {
+	// 		setIsLoadingPng((prev) => ({ ...prev, [pokemon.name]: false }));
+	// 	}
+	// };
+
 	const handleViewPng = async (pokemon: Pokemon, index: number) => {
 		if (pngImages[pokemon.name]) {
 			try {
@@ -2753,7 +2931,13 @@ const SharedResults = ({
 					pngImages[pokemon.name]
 				);
 
-				// Send pixelated version to generate-pokemon-svg
+				// Create a new pokemon object with the pixelated image but keep all other properties
+				const pixelatedPokemon = {
+					...pokemon,
+					image: `data:image/png;base64,${pixelatedBase64}`,
+				};
+
+				// Send both original and pixelated versions to generate-pokemon-svg
 				const generateResponse = await fetch(
 					"/api/generate-pokemon-svg",
 					{
@@ -2762,9 +2946,8 @@ const SharedResults = ({
 							"Content-Type": "application/json",
 						},
 						body: JSON.stringify({
-							pokemon,
+							pokemon: pixelatedPokemon,
 							index,
-							pngBase64: pixelatedBase64,
 							hexColor: hexColors[pokemon.type],
 							emoji: typeEmojis[pokemon.type],
 							originalImageSize: getImageSize(index),
@@ -2811,12 +2994,18 @@ const SharedResults = ({
 						[pokemon.name]: data.pngBase64,
 					}));
 
-					// Pixelate it before sending to generate-pokemon-svg
+					// Pixelate for display
 					const pixelatedBase64 = await applyRandomPixelation(
 						data.pngBase64
 					);
 
-					// Send pixelated version to generate-pokemon-svg
+					// Create pokemon object with pixelated image for SVG generation
+					const pixelatedPokemon = {
+						...pokemon,
+						image: `data:image/png;base64,${pixelatedBase64}`,
+					};
+
+					// Send to generate-pokemon-svg
 					const generateResponse = await fetch(
 						"/api/generate-pokemon-svg",
 						{
@@ -2825,9 +3014,8 @@ const SharedResults = ({
 								"Content-Type": "application/json",
 							},
 							body: JSON.stringify({
-								pokemon,
+								pokemon: pixelatedPokemon,
 								index,
-								pngBase64: pixelatedBase64,
 								hexColor: hexColors[pokemon.type],
 								emoji: typeEmojis[pokemon.type],
 								originalImageSize: getImageSize(index),
