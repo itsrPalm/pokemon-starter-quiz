@@ -716,36 +716,46 @@ const ProductModal = ({
 	}, [pngImage, resultId, pokemon]);
 
 	const generateMockup = async (variant: HatVariant) => {
-		if (!variant) return;
+		if (!variant || !variant.printfulFileId) return;
 
 		setIsGeneratingMockup(true);
 		try {
-			// Generate mockup using the mockup API
+			console.log("Generating mockup for variant:", variant);
+
 			const mockupResponse = await fetch("/api/mockup", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					variantId: variant.id, // Use 'id' or another existing property instead of 'printfulFileId'
+					variantId: variant.printfulFileId,
 					imageUrl: variant.image,
 				}),
 			});
 
 			if (!mockupResponse.ok) {
-				throw new Error("Failed to generate mockup");
+				const errorData = await mockupResponse.json();
+				console.error("Mockup generation failed:", errorData);
+				throw new Error(
+					errorData.details || "Failed to generate mockup"
+				);
 			}
 
 			const mockupData = await mockupResponse.json();
 
 			if (mockupData.mockupUrl) {
+				console.log("Received mockup URL:", mockupData.mockupUrl);
 				setMockupUrl(mockupData.mockupUrl);
 			} else {
 				throw new Error("No mockup URL returned");
 			}
 		} catch (error) {
 			console.error("Error generating mockup:", error);
-			setError("Failed to generate product preview");
+			setError(
+				error instanceof Error
+					? error.message
+					: "Failed to generate product preview"
+			);
 		} finally {
 			setIsGeneratingMockup(false);
 		}

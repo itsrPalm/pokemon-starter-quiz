@@ -141,6 +141,7 @@ export interface HatVariant {
 	hatProductId: string;
 	createdAt: Date;
 	updatedAt: Date;
+	printfulFileId?: string; // Add this line to include printfulFileId
 }
 
 // export interface HatProduct {
