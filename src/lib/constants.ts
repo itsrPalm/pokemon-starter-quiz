@@ -1210,3 +1210,56 @@ export interface PokemonData {
 	type: "grass" | "fire" | "water";
 	traits: string[];
 }
+
+export interface PrintfulFile {
+	id: number;
+	url: string;
+	hash: string | null;
+	filename: string;
+	mime_type: string | null;
+	size: number;
+	width: number | null;
+	height: number | null;
+	dpi: number | null;
+	status: "waiting" | "processing" | "accepted" | "rejected";
+	created: string;
+	thumbnail_url: string | null;
+	preview_url: string | null;
+	visible: boolean;
+	is_temporary: boolean;
+	_links: {
+		self: { href: string };
+	};
+}
+
+export const THREAD_COLORS = {
+	"#FFFFFF": "1801 White",
+	"#000000": "1800 Black",
+	"#96A1A8": "1718 Grey",
+	"#A67843": "1672 Old Gold",
+	"#FFCC00": "1951 Gold",
+	"#E25C27": "1987 Orange",
+	"#CC3366": "1910 Flamingo",
+	"#CC3333": "1839 Red",
+	"#660000": "1784 Maroon",
+	"#333366": "1966 Navy",
+	"#005397": "1842 Royal",
+	"#3399FF": "1695 Aqua/Teal",
+	"#6B5294": "1832 Purple",
+	"#01784E": "1751 Kelly Green",
+	"#7BA35A": "1848 Kiwi Green",
+};
+
+export const EMBROIDERY_POSITIONS = {
+	front: { id: "embroidery_front", price: 2.95 },
+	front_large: { id: "embroidery_front_large", price: 2.95 },
+	back: { id: "embroidery_back", price: 2.95 },
+	right: { id: "embroidery_right", price: 2.95 },
+	left: { id: "embroidery_left", price: 2.95 },
+};
+
+export const EMBROIDERY_TYPES = {
+	flat: { title: "Flat Embroidery", price: 0.0 },
+	"3d": { title: "3D Puff", price: 1.5 },
+	both: { title: "Partial 3D Puff", price: 1.5 },
+};

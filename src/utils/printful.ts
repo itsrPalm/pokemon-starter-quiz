@@ -27,36 +27,91 @@ import { v4 as uuidv4 } from "uuid";
 //   return response.data.result;
 // };
 
+// export async function waitForFile(
+// 	client: PrintfulClient,
+// 	fileId: number,
+// 	maxAttempts = 5
+// ): Promise<PrintfulFile> {
+// 	console.log(`Waiting for file ${fileId} to process...`);
+
+// 	for (let i = 0; i < maxAttempts; i++) {
+// 		const response = await client.get(`v2/files/${fileId}`);
+// 		const fileData = response.data;
+
+// 		if (fileData) {
+// 			console.log(`File status check ${i + 1}/${maxAttempts}:`, {
+// 				fileId,
+// 				status: fileData.status,
+// 			});
+
+// 			if (fileData.status === "accepted") {
+// 				return fileData;
+// 			} else if (fileData.status === "rejected") {
+// 				throw new Error("File was rejected by Printful");
+// 			}
+// 		} else {
+// 			throw new Error("File data is undefined");
+// 		}
+
+// 		await new Promise((resolve) => setTimeout(resolve, 1000));
+// 	}
+
+// 	throw new Error("File processing timed out");
+// }
+
 export async function waitForFile(
 	client: PrintfulClient,
 	fileId: number,
-	maxAttempts = 5
+	maxAttempts = 10
 ): Promise<PrintfulFile> {
 	console.log(`Waiting for file ${fileId} to process...`);
 
 	for (let i = 0; i < maxAttempts; i++) {
-		const response = await client.get(`v2/files/${fileId}`);
-		const fileData = response.data;
+		try {
+			const response = await client.get(`v2/files/${fileId}`);
+			const fileData = response.data;
 
-		if (fileData) {
+			if (!fileData) {
+				throw new Error("File data is undefined");
+			}
+
 			console.log(`File status check ${i + 1}/${maxAttempts}:`, {
 				fileId,
 				status: fileData.status,
+				preview_url: fileData.preview_url,
+				hash: fileData.hash,
 			});
 
 			if (fileData.status === "accepted") {
 				return fileData;
-			} else if (fileData.status === "rejected") {
-				throw new Error("File was rejected by Printful");
+			} else if (
+				fileData.status === "rejected" ||
+				["failed", "waiting", "processing"].includes(fileData.status)
+			) {
+				throw new Error(
+					`File was rejected by Printful with status: ${fileData.status}`
+				);
 			}
-		} else {
-			throw new Error("File data is undefined");
-		}
 
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Exponential backoff with maximum of 5 seconds
+			const delay = Math.min(1000 * Math.pow(1.5, i), 5000);
+			await new Promise((resolve) => setTimeout(resolve, delay));
+		} catch (error) {
+			console.error(
+				`Error checking file status (attempt ${i + 1}/${maxAttempts}):`,
+				error
+			);
+
+			if (i === maxAttempts - 1) {
+				throw error;
+			}
+
+			// Wait before retrying
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+		}
 	}
 
-	throw new Error("File processing timed out");
+	throw new Error(`File processing timed out after ${maxAttempts} attempts`);
 }
 
 export function randomizeThreadColors(): string[] {
