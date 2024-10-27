@@ -736,6 +736,12 @@ const ProductModal = ({
 			if (!mockupResponse.ok) {
 				const errorData = await mockupResponse.json();
 				console.error("Mockup generation failed:", errorData);
+				if (errorData.printfulError) {
+					console.error(
+						"Printful error details:",
+						errorData.printfulError
+					);
+				}
 				throw new Error(
 					errorData.details || "Failed to generate mockup"
 				);
