@@ -1,444 +1,3 @@
-// "use client";
-
-// import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-// import NextImage from "next/image";
-// import { motion } from "framer-motion";
-// import {
-// 	FaPlay,
-// 	FaPause,
-// 	FaInfoCircle,
-// 	FaEye,
-// 	FaStar,
-// 	FaMedal,
-// 	FaHandsHelping,
-// 	FaRandom,
-// 	FaShoppingCart,
-// 	FaTshirt,
-// 	FaChevronRight,
-// 	FaSpinner,
-// } from "react-icons/fa";
-// import { Card, CardHeader, CardContent } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import {
-// 	Select,
-// 	SelectTrigger,
-// 	SelectValue,
-// 	SelectContent,
-// 	SelectItem,
-// } from "@/components/ui/select";
-// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-// import Tooltip from "./Tooltip";
-// import { typeStyles } from "@/lib/typeStyles";
-// import {
-// 	Pokemon,
-// 	HatVariant,
-// 	DEFAULT_PALETTES,
-// 	SharedResultsProps,
-// 	hexColors,
-// 	typeEmojis,
-// 	pixelSizes,
-// 	ditherTypes,
-// 	strengthRange,
-// } from "@/lib/constants";
-// import { convertFileToBase64 } from "@/lib/base64-utils";
-// import {
-// 	base64ToImage,
-// 	pixelate,
-// 	sourceToSvg,
-// 	svgToImage,
-// } from "@/utils/manipulation";
-// import { Pokeball } from "./Pokeball";
-
-// /** Reusable Components */
-// const ProductSelector = ({
-// 	variants,
-// 	selectedVariant,
-// 	onVariantChange,
-// 	onRandomize,
-// 	isLoading,
-// }: {
-// 	variants: HatVariant[];
-// 	selectedVariant: HatVariant | null;
-// 	onVariantChange: (variant: HatVariant) => void;
-// 	onRandomize: () => void;
-// 	isLoading: boolean;
-// }) => {
-// 	return (
-// 		<div className="flex flex-col gap-4 w-full max-w-sm">
-// 			<div className="flex items-center gap-2">
-// 				<Select
-// 					value={selectedVariant?.id?.toString() || ""}
-// 					onValueChange={(value: string) => {
-// 						const variant = variants.find(
-// 							(v) => v.id.toString() === value
-// 						);
-// 						if (variant) onVariantChange(variant);
-// 					}}
-// 				>
-// 					<SelectTrigger className="w-full">
-// 						<SelectValue placeholder="Select a product style" />
-// 					</SelectTrigger>
-// 					<SelectContent>
-// 						{variants.map((variant: HatVariant) => (
-// 							<SelectItem
-// 								key={variant.id}
-// 								value={variant.id.toString()}
-// 							>
-// 								{variant.name} - $
-// 								{variant.retailPrice.toFixed(2)}
-// 							</SelectItem>
-// 						))}
-// 					</SelectContent>
-// 				</Select>
-// 				<Button
-// 					variant="outline"
-// 					size="icon"
-// 					onClick={onRandomize}
-// 					disabled={isLoading}
-// 					aria-label="Randomize Selection"
-// 				>
-// 					{isLoading ? (
-// 						<FaSpinner className="animate-spin h-4 w-4" />
-// 					) : (
-// 						<FaRandom className="h-4 w-4" />
-// 					)}
-// 				</Button>
-// 			</div>
-// 		</div>
-// 	);
-// };
-
-// const ProductViewer = ({
-// 	variant,
-// 	pngImage,
-// 	isGeneratingMockup,
-// 	mockupUrl,
-// 	onCheckout,
-// }: {
-// 	variant: HatVariant | null;
-// 	pngImage: string;
-// 	isGeneratingMockup: boolean;
-// 	mockupUrl: string | null;
-// 	onCheckout: () => void;
-// }) => {
-// 	return (
-// 		<div className="flex flex-col items-center gap-6 w-full">
-// 			<Tabs defaultValue="original" className="w-full">
-// 				<TabsList className="grid w-full grid-cols-2">
-// 					<TabsTrigger value="original">Original Design</TabsTrigger>
-// 					<TabsTrigger value="mockup" disabled={!mockupUrl}>
-// 						Product Preview
-// 					</TabsTrigger>
-// 				</TabsList>
-// 				<TabsContent
-// 					value="original"
-// 					className="flex justify-center items-center min-h-[512px]"
-// 				>
-// 					<Card className="w-full h-full flex justify-center items-center">
-// 						<CardContent className="p-4 flex justify-center items-center">
-// 							<div className="relative w-[512px] h-[512px] flex justify-center items-center">
-// 								<NextImage
-// 									src={`data:image/png;base64,${pngImage}`}
-// 									alt="Original design"
-// 									fill
-// 									className="object-contain"
-// 								/>
-// 							</div>
-// 						</CardContent>
-// 					</Card>
-// 				</TabsContent>
-// 				<TabsContent
-// 					value="mockup"
-// 					className="flex justify-center items-center min-h-[512px]"
-// 				>
-// 					<Card className="w-full h-full flex justify-center items-center">
-// 						<CardContent className="p-4 flex justify-center items-center">
-// 							{isGeneratingMockup ? (
-// 								<div className="flex items-center justify-center w-[512px] h-[512px]">
-// 									<FaSpinner className="animate-spin h-8 w-8 text-purple-600" />
-// 									<span className="ml-2">
-// 										Generating preview...
-// 									</span>
-// 								</div>
-// 							) : mockupUrl ? (
-// 								<div className="relative w-[512px] h-[512px] flex justify-center items-center">
-// 									<NextImage
-// 										src={mockupUrl}
-// 										alt="Product mockup"
-// 										fill
-// 										className="object-contain"
-// 									/>
-// 								</div>
-// 							) : null}
-// 						</CardContent>
-// 					</Card>
-// 				</TabsContent>
-// 			</Tabs>
-
-// 			<Button
-// 				size="lg"
-// 				className="w-full max-w-sm"
-// 				onClick={onCheckout}
-// 				disabled={!variant || isGeneratingMockup}
-// 				aria-label="Proceed to Checkout"
-// 			>
-// 				<FaShoppingCart className="mr-2" />
-// 				{isGeneratingMockup ? "Preparing Checkout..." : "Buy Now"}
-// 			</Button>
-// 		</div>
-// 	);
-// };
-
-// /** ProductModal Component with Updated Pixelation Logic */
-// const ProductModal = ({
-// 	isVisible,
-// 	onClose,
-// 	pokemon,
-// 	pngImage,
-// 	resultId,
-// }: {
-// 	isVisible: boolean;
-// 	onClose: () => void;
-// 	pokemon: Pokemon | undefined;
-// 	pngImage: string | null;
-// 	resultId: string;
-// }) => {
-// 	const [variants, setVariants] = useState<HatVariant[]>([]);
-// 	const [selectedVariant, setSelectedVariant] = useState<HatVariant | null>(
-// 		null
-// 	);
-// 	const [isLoading, setIsLoading] = useState(false);
-// 	const [isGeneratingMockup, setIsGeneratingMockup] = useState(false);
-// 	const [mockupUrl, setMockupUrl] = useState<string | null>(null);
-// 	const [error, setError] = useState<string | null>(null);
-
-// 	const applyRandomPixelation = useCallback(
-// 		async (imageBase64: string): Promise<string> => {
-// 			console.log("applyRandomPixelation ", imageBase64);
-// 			try {
-// 				const image = await base64ToImage(imageBase64);
-
-// 				const options = {
-// 					image,
-// 					width: pixelSizes[
-// 						Math.floor(Math.random() * pixelSizes.length)
-// 					],
-// 					dither: ditherTypes[
-// 						Math.floor(Math.random() * ditherTypes.length)
-// 					],
-// 					strength: Math.floor(
-// 						Math.random() *
-// 							(strengthRange.max - strengthRange.min) +
-// 							strengthRange.min
-// 					),
-// 					palette: DEFAULT_PALETTES[0].colors,
-// 					resolution: "original" as const,
-// 				};
-
-// 				return await pixelate(options);
-// 			} catch (error) {
-// 				console.error("Error during pixelation:", error);
-// 				throw new Error("Failed to pixelate image");
-// 			}
-// 		},
-// 		[]
-// 	);
-
-// 	const fetchVariants = useCallback(async () => {
-// 		try {
-// 			setIsLoading(true);
-// 			if (!pngImage) {
-// 				throw new Error("No image available");
-// 			}
-
-// 			// // Apply pixelation to the image first
-// 			// const pixelatedBase64 = await applyRandomPixelation(pngImage);
-
-// 			// // Send pixelated version to get hat variants
-// 			// const response = await fetch("/api/get-hat-variants", {
-// 			// 	method: "POST",
-// 			// 	headers: { "Content-Type": "application/json" },
-// 			// 	body: JSON.stringify({
-// 			// 		resultId,
-// 			// 		pngBase64: pixelatedBase64,
-// 			// 	}),
-// 			// });
-
-// 			// console.log("fetchVariants", pngImage);
-
-// 			const base64Data = pngImage.startsWith("data:image/png;base64,")
-// 				? pngImage.replace(/^data:image\/png;base64,/, "")
-// 				: pngImage;
-// 			const response = await fetch("/api/get-hat-variants", {
-// 				method: "POST",
-// 				headers: { "Content-Type": "application/json" },
-// 				body: JSON.stringify({ resultId, pngBase64: base64Data }),
-// 			});
-
-// 			if (!response.ok) {
-// 				const errorData = await response.json();
-// 				throw new Error(errorData.error || "Failed to fetch variants");
-// 			}
-
-// 			const data = await response.json();
-// 			if (!data || !data.variant) {
-// 				throw new Error("Invalid response structure");
-// 			}
-
-// 			setVariants([data.variant]);
-// 			setSelectedVariant(data.variant);
-// 		} catch (error: unknown) {
-// 			console.error("Error fetching variants:", error);
-// 			setError(
-// 				error instanceof Error
-// 					? error.message
-// 					: "Failed to load products"
-// 			);
-// 		} finally {
-// 			setIsLoading(false);
-// 		}
-// 	}, [pngImage, resultId, applyRandomPixelation]);
-
-// 	useEffect(() => {
-// 		if (isVisible && pngImage) {
-// 			fetchVariants();
-// 		}
-// 	}, [isVisible, pngImage, fetchVariants]);
-
-// 	const handleRandomize = useCallback(async () => {
-// 		if (!pngImage) return;
-// 		setIsLoading(true);
-// 		try {
-// 			await fetchVariants(); // This will generate a new pixelated version
-// 		} catch (error) {
-// 			console.error("Error during randomization:", error);
-// 			setError("Failed to randomize design");
-// 		} finally {
-// 			setIsLoading(false);
-// 		}
-// 	}, [pngImage, fetchVariants]);
-
-// 	const generateMockup = useCallback(async () => {
-// 		if (!selectedVariant || !pngImage) return;
-
-// 		setIsGeneratingMockup(true);
-// 		try {
-// 			if (selectedVariant.image) {
-// 				setMockupUrl(selectedVariant.image);
-// 			} else {
-// 				throw new Error("Mockup URL not found in variant data");
-// 			}
-// 		} catch (error) {
-// 			console.error("Error generating mockup:", error);
-// 			setError("Failed to generate product preview");
-// 		} finally {
-// 			setIsGeneratingMockup(false);
-// 		}
-// 	}, [selectedVariant, pngImage]);
-
-// 	useEffect(() => {
-// 		if (selectedVariant && pngImage) {
-// 			generateMockup();
-// 		}
-// 	}, [selectedVariant, pngImage, generateMockup]);
-
-// 	const handleCheckout = async () => {
-// 		if (!selectedVariant) return;
-
-// 		try {
-// 			const response = await fetch("/api/create-checkout-session", {
-// 				method: "POST",
-// 				headers: { "Content-Type": "application/json" },
-// 				body: JSON.stringify({
-// 					priceId: selectedVariant.stripePriceId,
-// 				}),
-// 			});
-
-// 			if (!response.ok) {
-// 				const errorData = await response.json();
-// 				throw new Error(
-// 					errorData.error || "Failed to create checkout session"
-// 				);
-// 			}
-
-// 			const data = await response.json();
-// 			if (data.url) {
-// 				window.location.href = data.url;
-// 			} else {
-// 				throw new Error("Failed to create checkout session");
-// 			}
-// 		} catch (error) {
-// 			console.error("Error during purchase:", error);
-// 			setError("Failed to initiate purchase. Please try again later.");
-// 		}
-// 	};
-
-// 	if (!isVisible || !pokemon || !pngImage) return null;
-
-// 	return (
-// 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-// 			<Card className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-// 				<CardHeader className="border-b">
-// 					<button
-// 						className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-// 						onClick={onClose}
-// 						aria-label="Close Modal"
-// 					>
-// 						×
-// 					</button>
-// 					<div className="flex items-center">
-// 						<FaTshirt className="text-3xl text-purple-600 mr-3" />
-// 						<h2 className="text-2xl font-bold text-purple-800">
-// 							Create Your Custom {pokemon.name} Product
-// 						</h2>
-// 					</div>
-// 				</CardHeader>
-
-// 				<CardContent className="p-6">
-// 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-// 						<div className="space-y-6">
-// 							{error && (
-// 								<div className="bg-red-100 text-red-700 p-3 rounded">
-// 									{error}
-// 								</div>
-// 							)}
-
-// 							<ProductSelector
-// 								variants={variants}
-// 								selectedVariant={selectedVariant}
-// 								onVariantChange={setSelectedVariant}
-// 								onRandomize={handleRandomize}
-// 								isLoading={isLoading}
-// 							/>
-
-// 							<div className="border-t pt-4">
-// 								<h3 className="text-lg font-semibold mb-2 flex items-center">
-// 									<FaChevronRight className="mr-2" />
-// 									About Your Design
-// 								</h3>
-// 								<p className="text-gray-600">
-// 									Custom {pokemon.name} design with{" "}
-// 									{pokemon.type}-type styling. Each
-// 									randomization creates a unique pixelated
-// 									style!
-// 								</p>
-// 							</div>
-// 						</div>
-
-// 						<ProductViewer
-// 							variant={selectedVariant}
-// 							pngImage={pngImage}
-// 							isGeneratingMockup={isGeneratingMockup}
-// 							mockupUrl={mockupUrl}
-// 							onCheckout={handleCheckout}
-// 						/>
-// 					</div>
-// 				</CardContent>
-// 			</Card>
-// 		</div>
-// 	);
-// };
-
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
@@ -595,14 +154,10 @@ const ProductViewer = ({
 					<Card className="w-full h-full flex justify-center items-center">
 						<CardContent className="p-4 flex justify-center items-center">
 							{isGeneratingMockup ? (
-								<div className="flex flex-col items-center justify-center w-[512px] h-[512px]">
-									<FaSpinner className="animate-spin h-8 w-8 text-purple-600 mb-4" />
-									<span className="text-center">
-										Generating product preview...
-										<br />
-										<span className="text-sm text-gray-500">
-											This may take a few moments
-										</span>
+								<div className="flex items-center justify-center w-[512px] h-[512px]">
+									<FaSpinner className="animate-spin h-8 w-8 text-purple-600" />
+									<span className="ml-2">
+										Generating preview...
 									</span>
 								</div>
 							) : mockupUrl ? (
@@ -625,18 +180,10 @@ const ProductViewer = ({
 				className="w-full max-w-sm"
 				onClick={onCheckout}
 				disabled={!variant || isGeneratingMockup}
+				aria-label="Proceed to Checkout"
 			>
-				{isGeneratingMockup ? (
-					<>
-						<FaSpinner className="animate-spin mr-2" />
-						Preparing Checkout...
-					</>
-				) : (
-					<>
-						<FaShoppingCart className="mr-2" />
-						Buy Now
-					</>
-				)}
+				<FaShoppingCart className="mr-2" />
+				{isGeneratingMockup ? "Preparing Checkout..." : "Buy Now"}
 			</Button>
 		</div>
 	);
@@ -665,7 +212,37 @@ const ProductModal = ({
 	const [mockupUrl, setMockupUrl] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
-	// ... (previous applyRandomPixelation implementation remains the same)
+	const applyRandomPixelation = useCallback(
+		async (imageBase64: string): Promise<string> => {
+			console.log("applyRandomPixelation ", imageBase64);
+			try {
+				const image = await base64ToImage(imageBase64);
+
+				const options = {
+					image,
+					width: pixelSizes[
+						Math.floor(Math.random() * pixelSizes.length)
+					],
+					dither: ditherTypes[
+						Math.floor(Math.random() * ditherTypes.length)
+					],
+					strength: Math.floor(
+						Math.random() *
+							(strengthRange.max - strengthRange.min) +
+							strengthRange.min
+					),
+					palette: DEFAULT_PALETTES[0].colors,
+					resolution: "original" as const,
+				};
+
+				return await pixelate(options);
+			} catch (error) {
+				console.error("Error during pixelation:", error);
+				throw new Error("Failed to pixelate image");
+			}
+		},
+		[]
+	);
 
 	const fetchVariants = useCallback(async () => {
 		try {
@@ -674,18 +251,28 @@ const ProductModal = ({
 				throw new Error("No image available");
 			}
 
+			// // Apply pixelation to the image first
+			// const pixelatedBase64 = await applyRandomPixelation(pngImage);
+
+			// // Send pixelated version to get hat variants
+			// const response = await fetch("/api/get-hat-variants", {
+			// 	method: "POST",
+			// 	headers: { "Content-Type": "application/json" },
+			// 	body: JSON.stringify({
+			// 		resultId,
+			// 		pngBase64: pixelatedBase64,
+			// 	}),
+			// });
+
+			// console.log("fetchVariants", pngImage);
+
 			const base64Data = pngImage.startsWith("data:image/png;base64,")
 				? pngImage.replace(/^data:image\/png;base64,/, "")
 				: pngImage;
-
 			const response = await fetch("/api/get-hat-variants", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					resultId,
-					pngBase64: base64Data,
-					pokemonName: pokemon?.name,
-				}),
+				body: JSON.stringify({ resultId, pngBase64: base64Data }),
 			});
 
 			if (!response.ok) {
@@ -700,9 +287,6 @@ const ProductModal = ({
 
 			setVariants([data.variant]);
 			setSelectedVariant(data.variant);
-
-			// Generate mockup after variant is created
-			await generateMockup(data.variant);
 		} catch (error: unknown) {
 			console.error("Error fetching variants:", error);
 			setError(
@@ -713,59 +297,7 @@ const ProductModal = ({
 		} finally {
 			setIsLoading(false);
 		}
-	}, [pngImage, resultId, pokemon]);
-
-	const generateMockup = async (variant: HatVariant) => {
-		if (!variant || !variant.printfulFileId) return;
-
-		setIsGeneratingMockup(true);
-		try {
-			console.log("Generating mockup for variant:", variant);
-
-			const mockupResponse = await fetch("/api/mockup", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					variantId: variant.printfulFileId,
-					imageUrl: variant.image,
-				}),
-			});
-
-			if (!mockupResponse.ok) {
-				const errorData = await mockupResponse.json();
-				console.error("Mockup generation failed:", errorData);
-				if (errorData.printfulError) {
-					console.error(
-						"Printful error details:",
-						errorData.printfulError
-					);
-				}
-				throw new Error(
-					errorData.details || "Failed to generate mockup"
-				);
-			}
-
-			const mockupData = await mockupResponse.json();
-
-			if (mockupData.mockupUrl) {
-				console.log("Received mockup URL:", mockupData.mockupUrl);
-				setMockupUrl(mockupData.mockupUrl);
-			} else {
-				throw new Error("No mockup URL returned");
-			}
-		} catch (error) {
-			console.error("Error generating mockup:", error);
-			setError(
-				error instanceof Error
-					? error.message
-					: "Failed to generate product preview"
-			);
-		} finally {
-			setIsGeneratingMockup(false);
-		}
-	};
+	}, [pngImage, resultId, applyRandomPixelation]);
 
 	useEffect(() => {
 		if (isVisible && pngImage) {
@@ -777,7 +309,7 @@ const ProductModal = ({
 		if (!pngImage) return;
 		setIsLoading(true);
 		try {
-			await fetchVariants();
+			await fetchVariants(); // This will generate a new pixelated version
 		} catch (error) {
 			console.error("Error during randomization:", error);
 			setError("Failed to randomize design");
@@ -786,11 +318,29 @@ const ProductModal = ({
 		}
 	}, [pngImage, fetchVariants]);
 
-	useEffect(() => {
-		if (selectedVariant) {
-			generateMockup(selectedVariant);
+	const generateMockup = useCallback(async () => {
+		if (!selectedVariant || !pngImage) return;
+
+		setIsGeneratingMockup(true);
+		try {
+			if (selectedVariant.image) {
+				setMockupUrl(selectedVariant.image);
+			} else {
+				throw new Error("Mockup URL not found in variant data");
+			}
+		} catch (error) {
+			console.error("Error generating mockup:", error);
+			setError("Failed to generate product preview");
+		} finally {
+			setIsGeneratingMockup(false);
 		}
-	}, [selectedVariant]);
+	}, [selectedVariant, pngImage]);
+
+	useEffect(() => {
+		if (selectedVariant && pngImage) {
+			generateMockup();
+		}
+	}, [selectedVariant, pngImage, generateMockup]);
 
 	const handleCheckout = async () => {
 		if (!selectedVariant) return;
@@ -888,6 +438,456 @@ const ProductModal = ({
 		</div>
 	);
 };
+
+// "use client";
+
+// import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+// import NextImage from "next/image";
+// import { motion } from "framer-motion";
+// import {
+// 	FaPlay,
+// 	FaPause,
+// 	FaInfoCircle,
+// 	FaEye,
+// 	FaStar,
+// 	FaMedal,
+// 	FaHandsHelping,
+// 	FaRandom,
+// 	FaShoppingCart,
+// 	FaTshirt,
+// 	FaChevronRight,
+// 	FaSpinner,
+// } from "react-icons/fa";
+// import { Card, CardHeader, CardContent } from "@/components/ui/card";
+// import { Button } from "@/components/ui/button";
+// import {
+// 	Select,
+// 	SelectTrigger,
+// 	SelectValue,
+// 	SelectContent,
+// 	SelectItem,
+// } from "@/components/ui/select";
+// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+// import Tooltip from "./Tooltip";
+// import { typeStyles } from "@/lib/typeStyles";
+// import {
+// 	Pokemon,
+// 	HatVariant,
+// 	DEFAULT_PALETTES,
+// 	SharedResultsProps,
+// 	hexColors,
+// 	typeEmojis,
+// 	pixelSizes,
+// 	ditherTypes,
+// 	strengthRange,
+// } from "@/lib/constants";
+// import { convertFileToBase64 } from "@/lib/base64-utils";
+// import {
+// 	base64ToImage,
+// 	pixelate,
+// 	sourceToSvg,
+// 	svgToImage,
+// } from "@/utils/manipulation";
+// import { Pokeball } from "./Pokeball";
+
+// /** Reusable Components */
+// const ProductSelector = ({
+// 	variants,
+// 	selectedVariant,
+// 	onVariantChange,
+// 	onRandomize,
+// 	isLoading,
+// }: {
+// 	variants: HatVariant[];
+// 	selectedVariant: HatVariant | null;
+// 	onVariantChange: (variant: HatVariant) => void;
+// 	onRandomize: () => void;
+// 	isLoading: boolean;
+// }) => {
+// 	return (
+// 		<div className="flex flex-col gap-4 w-full max-w-sm">
+// 			<div className="flex items-center gap-2">
+// 				<Select
+// 					value={selectedVariant?.id?.toString() || ""}
+// 					onValueChange={(value: string) => {
+// 						const variant = variants.find(
+// 							(v) => v.id.toString() === value
+// 						);
+// 						if (variant) onVariantChange(variant);
+// 					}}
+// 				>
+// 					<SelectTrigger className="w-full">
+// 						<SelectValue placeholder="Select a product style" />
+// 					</SelectTrigger>
+// 					<SelectContent>
+// 						{variants.map((variant: HatVariant) => (
+// 							<SelectItem
+// 								key={variant.id}
+// 								value={variant.id.toString()}
+// 							>
+// 								{variant.name} - $
+// 								{variant.retailPrice.toFixed(2)}
+// 							</SelectItem>
+// 						))}
+// 					</SelectContent>
+// 				</Select>
+// 				<Button
+// 					variant="outline"
+// 					size="icon"
+// 					onClick={onRandomize}
+// 					disabled={isLoading}
+// 					aria-label="Randomize Selection"
+// 				>
+// 					{isLoading ? (
+// 						<FaSpinner className="animate-spin h-4 w-4" />
+// 					) : (
+// 						<FaRandom className="h-4 w-4" />
+// 					)}
+// 				</Button>
+// 			</div>
+// 		</div>
+// 	);
+// };
+
+// const ProductViewer = ({
+// 	variant,
+// 	pngImage,
+// 	isGeneratingMockup,
+// 	mockupUrl,
+// 	onCheckout,
+// }: {
+// 	variant: HatVariant | null;
+// 	pngImage: string;
+// 	isGeneratingMockup: boolean;
+// 	mockupUrl: string | null;
+// 	onCheckout: () => void;
+// }) => {
+// 	return (
+// 		<div className="flex flex-col items-center gap-6 w-full">
+// 			<Tabs defaultValue="original" className="w-full">
+// 				<TabsList className="grid w-full grid-cols-2">
+// 					<TabsTrigger value="original">Original Design</TabsTrigger>
+// 					<TabsTrigger value="mockup" disabled={!mockupUrl}>
+// 						Product Preview
+// 					</TabsTrigger>
+// 				</TabsList>
+// 				<TabsContent
+// 					value="original"
+// 					className="flex justify-center items-center min-h-[512px]"
+// 				>
+// 					<Card className="w-full h-full flex justify-center items-center">
+// 						<CardContent className="p-4 flex justify-center items-center">
+// 							<div className="relative w-[512px] h-[512px] flex justify-center items-center">
+// 								<NextImage
+// 									src={`data:image/png;base64,${pngImage}`}
+// 									alt="Original design"
+// 									fill
+// 									className="object-contain"
+// 								/>
+// 							</div>
+// 						</CardContent>
+// 					</Card>
+// 				</TabsContent>
+// 				<TabsContent
+// 					value="mockup"
+// 					className="flex justify-center items-center min-h-[512px]"
+// 				>
+// 					<Card className="w-full h-full flex justify-center items-center">
+// 						<CardContent className="p-4 flex justify-center items-center">
+// 							{isGeneratingMockup ? (
+// 								<div className="flex flex-col items-center justify-center w-[512px] h-[512px]">
+// 									<FaSpinner className="animate-spin h-8 w-8 text-purple-600 mb-4" />
+// 									<span className="text-center">
+// 										Generating product preview...
+// 										<br />
+// 										<span className="text-sm text-gray-500">
+// 											This may take a few moments
+// 										</span>
+// 									</span>
+// 								</div>
+// 							) : mockupUrl ? (
+// 								<div className="relative w-[512px] h-[512px] flex justify-center items-center">
+// 									<NextImage
+// 										src={mockupUrl}
+// 										alt="Product mockup"
+// 										fill
+// 										className="object-contain"
+// 									/>
+// 								</div>
+// 							) : null}
+// 						</CardContent>
+// 					</Card>
+// 				</TabsContent>
+// 			</Tabs>
+
+// 			<Button
+// 				size="lg"
+// 				className="w-full max-w-sm"
+// 				onClick={onCheckout}
+// 				disabled={!variant || isGeneratingMockup}
+// 			>
+// 				{isGeneratingMockup ? (
+// 					<>
+// 						<FaSpinner className="animate-spin mr-2" />
+// 						Preparing Checkout...
+// 					</>
+// 				) : (
+// 					<>
+// 						<FaShoppingCart className="mr-2" />
+// 						Buy Now
+// 					</>
+// 				)}
+// 			</Button>
+// 		</div>
+// 	);
+// };
+
+// /** ProductModal Component with Updated Pixelation Logic */
+// const ProductModal = ({
+// 	isVisible,
+// 	onClose,
+// 	pokemon,
+// 	pngImage,
+// 	resultId,
+// }: {
+// 	isVisible: boolean;
+// 	onClose: () => void;
+// 	pokemon: Pokemon | undefined;
+// 	pngImage: string | null;
+// 	resultId: string;
+// }) => {
+// 	const [variants, setVariants] = useState<HatVariant[]>([]);
+// 	const [selectedVariant, setSelectedVariant] = useState<HatVariant | null>(
+// 		null
+// 	);
+// 	const [isLoading, setIsLoading] = useState(false);
+// 	const [isGeneratingMockup, setIsGeneratingMockup] = useState(false);
+// 	const [mockupUrl, setMockupUrl] = useState<string | null>(null);
+// 	const [error, setError] = useState<string | null>(null);
+
+// 	// ... (previous applyRandomPixelation implementation remains the same)
+
+// 	const fetchVariants = useCallback(async () => {
+// 		try {
+// 			setIsLoading(true);
+// 			if (!pngImage) {
+// 				throw new Error("No image available");
+// 			}
+
+// 			const base64Data = pngImage.startsWith("data:image/png;base64,")
+// 				? pngImage.replace(/^data:image\/png;base64,/, "")
+// 				: pngImage;
+
+// 			const response = await fetch("/api/get-hat-variants", {
+// 				method: "POST",
+// 				headers: { "Content-Type": "application/json" },
+// 				body: JSON.stringify({
+// 					resultId,
+// 					pngBase64: base64Data,
+// 					pokemonName: pokemon?.name,
+// 				}),
+// 			});
+
+// 			if (!response.ok) {
+// 				const errorData = await response.json();
+// 				throw new Error(errorData.error || "Failed to fetch variants");
+// 			}
+
+// 			const data = await response.json();
+// 			if (!data || !data.variant) {
+// 				throw new Error("Invalid response structure");
+// 			}
+
+// 			setVariants([data.variant]);
+// 			setSelectedVariant(data.variant);
+
+// 			// Generate mockup after variant is created
+// 			await generateMockup(data.variant);
+// 		} catch (error: unknown) {
+// 			console.error("Error fetching variants:", error);
+// 			setError(
+// 				error instanceof Error
+// 					? error.message
+// 					: "Failed to load products"
+// 			);
+// 		} finally {
+// 			setIsLoading(false);
+// 		}
+// 	}, [pngImage, resultId, pokemon]);
+
+// 	const generateMockup = async (variant: HatVariant) => {
+// 		if (!variant || !variant.printfulFileId) return;
+
+// 		setIsGeneratingMockup(true);
+// 		try {
+// 			console.log("Generating mockup for variant:", variant);
+
+// 			const mockupResponse = await fetch("/api/mockup", {
+// 				method: "POST",
+// 				headers: {
+// 					"Content-Type": "application/json",
+// 				},
+// 				body: JSON.stringify({
+// 					variantId: variant.printfulFileId,
+// 					imageUrl: variant.image,
+// 				}),
+// 			});
+
+// 			if (!mockupResponse.ok) {
+// 				const errorData = await mockupResponse.json();
+// 				console.error("Mockup generation failed:", errorData);
+// 				if (errorData.printfulError) {
+// 					console.error(
+// 						"Printful error details:",
+// 						errorData.printfulError
+// 					);
+// 				}
+// 				throw new Error(
+// 					errorData.details || "Failed to generate mockup"
+// 				);
+// 			}
+
+// 			const mockupData = await mockupResponse.json();
+
+// 			if (mockupData.mockupUrl) {
+// 				console.log("Received mockup URL:", mockupData.mockupUrl);
+// 				setMockupUrl(mockupData.mockupUrl);
+// 			} else {
+// 				throw new Error("No mockup URL returned");
+// 			}
+// 		} catch (error) {
+// 			console.error("Error generating mockup:", error);
+// 			setError(
+// 				error instanceof Error
+// 					? error.message
+// 					: "Failed to generate product preview"
+// 			);
+// 		} finally {
+// 			setIsGeneratingMockup(false);
+// 		}
+// 	};
+
+// 	useEffect(() => {
+// 		if (isVisible && pngImage) {
+// 			fetchVariants();
+// 		}
+// 	}, [isVisible, pngImage, fetchVariants]);
+
+// 	const handleRandomize = useCallback(async () => {
+// 		if (!pngImage) return;
+// 		setIsLoading(true);
+// 		try {
+// 			await fetchVariants();
+// 		} catch (error) {
+// 			console.error("Error during randomization:", error);
+// 			setError("Failed to randomize design");
+// 		} finally {
+// 			setIsLoading(false);
+// 		}
+// 	}, [pngImage, fetchVariants]);
+
+// 	useEffect(() => {
+// 		if (selectedVariant) {
+// 			generateMockup(selectedVariant);
+// 		}
+// 	}, [selectedVariant]);
+
+// 	const handleCheckout = async () => {
+// 		if (!selectedVariant) return;
+
+// 		try {
+// 			const response = await fetch("/api/create-checkout-session", {
+// 				method: "POST",
+// 				headers: { "Content-Type": "application/json" },
+// 				body: JSON.stringify({
+// 					priceId: selectedVariant.stripePriceId,
+// 				}),
+// 			});
+
+// 			if (!response.ok) {
+// 				const errorData = await response.json();
+// 				throw new Error(
+// 					errorData.error || "Failed to create checkout session"
+// 				);
+// 			}
+
+// 			const data = await response.json();
+// 			if (data.url) {
+// 				window.location.href = data.url;
+// 			} else {
+// 				throw new Error("Failed to create checkout session");
+// 			}
+// 		} catch (error) {
+// 			console.error("Error during purchase:", error);
+// 			setError("Failed to initiate purchase. Please try again later.");
+// 		}
+// 	};
+
+// 	if (!isVisible || !pokemon || !pngImage) return null;
+
+// 	return (
+// 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+// 			<Card className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+// 				<CardHeader className="border-b">
+// 					<button
+// 						className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+// 						onClick={onClose}
+// 						aria-label="Close Modal"
+// 					>
+// 						×
+// 					</button>
+// 					<div className="flex items-center">
+// 						<FaTshirt className="text-3xl text-purple-600 mr-3" />
+// 						<h2 className="text-2xl font-bold text-purple-800">
+// 							Create Your Custom {pokemon.name} Product
+// 						</h2>
+// 					</div>
+// 				</CardHeader>
+
+// 				<CardContent className="p-6">
+// 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+// 						<div className="space-y-6">
+// 							{error && (
+// 								<div className="bg-red-100 text-red-700 p-3 rounded">
+// 									{error}
+// 								</div>
+// 							)}
+
+// 							<ProductSelector
+// 								variants={variants}
+// 								selectedVariant={selectedVariant}
+// 								onVariantChange={setSelectedVariant}
+// 								onRandomize={handleRandomize}
+// 								isLoading={isLoading}
+// 							/>
+
+// 							<div className="border-t pt-4">
+// 								<h3 className="text-lg font-semibold mb-2 flex items-center">
+// 									<FaChevronRight className="mr-2" />
+// 									About Your Design
+// 								</h3>
+// 								<p className="text-gray-600">
+// 									Custom {pokemon.name} design with{" "}
+// 									{pokemon.type}-type styling. Each
+// 									randomization creates a unique pixelated
+// 									style!
+// 								</p>
+// 							</div>
+// 						</div>
+
+// 						<ProductViewer
+// 							variant={selectedVariant}
+// 							pngImage={pngImage}
+// 							isGeneratingMockup={isGeneratingMockup}
+// 							mockupUrl={mockupUrl}
+// 							onCheckout={handleCheckout}
+// 						/>
+// 					</div>
+// 				</CardContent>
+// 			</Card>
+// 		</div>
+// 	);
+// };
 
 /** Main SharedResults Component */
 const SharedResults = ({
