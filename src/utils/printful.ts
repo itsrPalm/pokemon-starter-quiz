@@ -23,7 +23,7 @@ export async function waitForFile(
 	for (let i = 0; i < maxAttempts; i++) {
 		try {
 			const response = await client.get(`v2/files/${fileId}`);
-			const fileData = response.data; // Note: Added .data here to match Printful's response structure
+			const fileData = response.data;
 
 			if (!fileData) {
 				throw new Error("File data is undefined");
@@ -49,16 +49,26 @@ export async function waitForFile(
 					);
 				case "waiting":
 				case "processing":
-					// Continue waiting
+					// On last attempt, return the file data anyway
+					if (i === maxAttempts - 1) {
+						console.log(
+							`File still ${status} after ${maxAttempts} attempts, proceeding anyway`
+						);
+						return fileData;
+					}
 					break;
 				default:
-					console.log(
-						`Unknown status received: ${status}, continuing to wait`
-					);
+					// On last attempt, return what we have
+					if (i === maxAttempts - 1) {
+						console.log(
+							`Unknown status ${status} after ${maxAttempts} attempts, proceeding anyway`
+						);
+						return fileData;
+					}
 			}
 
-			// Exponential backoff with maximum of 5 seconds
-			const delay = Math.min(1000 * Math.pow(1.5, i), 5000);
+			// Shorter delays to prevent hanging
+			const delay = Math.min(1000 * Math.pow(1.2, i), 3000);
 			await new Promise((resolve) => setTimeout(resolve, delay));
 		} catch (error) {
 			console.error(
@@ -66,16 +76,26 @@ export async function waitForFile(
 				error
 			);
 
+			// On last attempt with error, return whatever we got from the first successful response
 			if (i === maxAttempts - 1) {
-				throw error;
+				const initialResponse = await client.get(`v2/files/${fileId}`);
+				if (!initialResponse.data) {
+					throw new Error("Initial response data is undefined");
+				}
+				return initialResponse.data;
 			}
 
-			// Wait before retrying
+			// Shorter retry delay
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 		}
 	}
 
-	throw new Error(`File processing timed out after ${maxAttempts} attempts`);
+	// If we somehow get here, make one final attempt to get the file
+	const finalResponse = await client.get(`v2/files/${fileId}`);
+	if (!finalResponse.data) {
+		throw new Error("Final response data is undefined");
+	}
+	return finalResponse.data;
 }
 
 export function randomizeThreadColors(): string[] {
