@@ -782,20 +782,14 @@
 // }
 
 import { NextRequest, NextResponse } from "next/server";
-import { convertFileToBase64 } from "@/lib/base64-utils";
-
-interface PokemonData {
-	name: string;
-	image: string | null;
-	description: string;
-	type: "grass" | "fire" | "water";
-	traits: string[];
-}
+// import { convertFileToBase64 } from "@/lib/base64-utils";
+import { PokemonData } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
 	try {
 		const {
 			pokemon,
+			pixelatedOg,
 			index,
 			hexColor,
 			emoji,
@@ -803,6 +797,7 @@ export async function POST(req: NextRequest) {
 			originalFontSize,
 		}: {
 			pokemon: PokemonData;
+			pixelatedOg: string;
 			index: number;
 			hexColor: string;
 			emoji: string;
@@ -814,10 +809,10 @@ export async function POST(req: NextRequest) {
 			`Original Image Size: ${originalImageSize}, Original Font Size: ${originalFontSize}`
 		);
 
-		const base64Image = await convertFileToBase64(
-			pokemon.image || "/placeholder-pokemon.png"
-			// "https://us-east.storage.cloudconvert.com/tasks/8c87b37c-7e2b-49bc-bb25-0f9572e48df4/DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241025%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20241025T080408Z&X-Amz-Expires=86400&X-Amz-Signature=521f929cbc92b5a618ded96883fae5924b8560b364265cbbcf3421a03fb07bff&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png%22&response-content-type=image%2Fpng&x-id=GetObject"
-		);
+		// const base64Image = await convertFileToBase64(
+		// 	pokemon.image || "/placeholder-pokemon.png"
+		// 	// "https://us-east.storage.cloudconvert.com/tasks/8c87b37c-7e2b-49bc-bb25-0f9572e48df4/DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241025%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20241025T080408Z&X-Amz-Expires=86400&X-Amz-Signature=521f929cbc92b5a618ded96883fae5924b8560b364265cbbcf3421a03fb07bff&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22DripTrace_DMT_entities_playing_with_sacred_geometrical_symmetry_8d2d2f62-81f3-46ee-8e38-e23abc3c9062.png%22&response-content-type=image%2Fpng&x-id=GetObject"
+		// );
 
 		// Adjust sizes for high DPI rendering, with a max of 300 DPI
 		const dpiScale = 300 / 96; // Standard SVG DPI is 96, scale to 300 DPI
@@ -901,7 +896,7 @@ export async function POST(req: NextRequest) {
                 </textPath>
             </text>
 
-            <image href="${base64Image}" x="${(svgSize - imageSize) / 2}" y="${
+            <image href="${pixelatedOg}" x="${(svgSize - imageSize) / 2}" y="${
 			160 * dpiScale
 		}" width="${imageSize}" height="${imageSize}" />
 

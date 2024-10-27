@@ -7491,6 +7491,9 @@ const ProductModal = ({
 			const base64Data = pngImage.startsWith("data:image/png;base64,")
 				? pngImage.replace(/^data:image\/png;base64,/, "")
 				: pngImage;
+
+			console.log(base64Data);
+
 			const response = await fetch("/api/get-hat-variants", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },

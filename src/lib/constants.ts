@@ -1077,3 +1077,136 @@ export const grassPokemonGroups: PokemonGroup[] = [
 		],
 	},
 ];
+
+/** Default Palettes for Pixelation */
+export const DEFAULT_PALETTES = [
+	{
+		name: "Pokemon Types",
+		colors: [
+			"#78C850", // Grass
+			"#F08030", // Fire
+			"#6890F0", // Water
+			"#F85888", // Psychic
+			"#A8B820", // Bug
+			"#A040A0", // Poison
+			"#F8D030", // Electric
+			"#E0C068", // Ground
+			"#C03028", // Fighting
+			"#F0C030", // Rock
+			"#98D8D8", // Ice
+			"#A890F0", // Dragon
+			"#705898", // Ghost
+			"#705848", // Rock
+			"#B8A038", // Normal
+		],
+	},
+];
+
+/** Constants */
+export const hexColors: Record<string, string> = {
+	grass: "#78C850",
+	fire: "#F08030",
+	water: "#6890F0",
+};
+
+export const typeEmojis: Record<string, string> = {
+	grass: "🌿",
+	fire: "🔥",
+	water: "💧",
+};
+
+/** Types */
+export type SourceOptions = {
+	type?: DOMParserSupportedType;
+	trim?: boolean;
+	color?: string;
+};
+
+export interface SharedResultsProps {
+	resultId: string;
+	trainerName: string;
+	teamSummary: string;
+	allPokemon: Pokemon[];
+	rankings?: {
+		grass?: { top: string; runnerUp: string; canRelate: string };
+		fire?: { top: string; runnerUp: string; canRelate: string };
+		water?: { top: string; runnerUp: string; canRelate: string };
+	};
+}
+
+export interface ProductSelectorProps {
+	variants: HatVariant[];
+	selectedVariant: HatVariant | null;
+	onVariantChange: (variant: HatVariant) => void;
+	onRandomize: () => void;
+	isLoading: boolean;
+}
+
+export interface ProductViewerProps {
+	variant: HatVariant | null;
+	pngImage: string;
+	isGeneratingMockup: boolean;
+	mockupUrl: string | null;
+	onCheckout: () => void;
+}
+
+export interface PokeballProps {
+	isOpen: boolean;
+	children: React.ReactNode;
+	imageSize: number;
+}
+
+export interface ProductModalProps {
+	isVisible: boolean;
+	onClose: () => void;
+	pokemon: Pokemon | undefined;
+	pngImage: string | null;
+	resultId: string;
+}
+
+// Random pixelation settings
+export const pixelSizes = [32, 48, 64, 96, 128];
+export const ditherTypes = [
+	"Floyd-Steinberg",
+	"4x4 Bayer",
+	"Atkinson",
+	"2x2 Bayer",
+	"ordered",
+];
+
+export const strengthRange = { min: 20, max: 80 };
+
+export interface PixelateOptions {
+	image: HTMLImageElement;
+	width: number;
+	dither: string;
+	strength: number;
+	palette: string[];
+	resolution: "original";
+}
+
+export interface Rankings {
+	grass?: {
+		top: string;
+		runnerUp: string;
+		canRelate: string;
+	};
+	fire?: {
+		top: string;
+		runnerUp: string;
+		canRelate: string;
+	};
+	water?: {
+		top: string;
+		runnerUp: string;
+		canRelate: string;
+	};
+}
+
+export interface PokemonData {
+	name: string;
+	image: string | null;
+	description: string;
+	type: "grass" | "fire" | "water";
+	traits: string[];
+}

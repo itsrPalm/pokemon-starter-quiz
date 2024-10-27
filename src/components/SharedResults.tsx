@@ -1637,13 +1637,7 @@
 
 "use client";
 
-import React, {
-	useState,
-	useEffect,
-	useRef,
-	useMemo,
-	useCallback,
-} from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import NextImage from "next/image";
 import { motion } from "framer-motion";
 import {
@@ -1672,562 +1666,25 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Tooltip from "./Tooltip";
 import { typeStyles } from "@/lib/typeStyles";
-import { Pokemon, HatVariant } from "@/lib/constants";
-
-/** Default Palettes for Pixelation */
-const DEFAULT_PALETTES = [
-	{
-		name: "Pokemon Types",
-		colors: [
-			"#78C850", // Grass
-			"#F08030", // Fire
-			"#6890F0", // Water
-			"#F85888", // Psychic
-			"#A8B820", // Bug
-			"#A040A0", // Poison
-			"#F8D030", // Electric
-			"#E0C068", // Ground
-			"#C03028", // Fighting
-			"#F0C030", // Rock
-			"#98D8D8", // Ice
-			"#A890F0", // Dragon
-			"#705898", // Ghost
-			"#705848", // Rock
-			"#B8A038", // Normal
-		],
-	},
-];
-
-/** Utility Functions */
-const getFilterId = () => "filter-" + String(Math.random()).slice(2);
-
-const urlToImage = (url: string): Promise<HTMLImageElement> =>
-	new Promise<HTMLImageElement>((resolve, reject) => {
-		const image = new Image();
-		image.crossOrigin = "anonymous";
-		image.onload = () => resolve(image);
-		image.onerror = () =>
-			reject(new Error("Couldn't convert SVG to image element"));
-		image.src = url;
-	});
-
-const base64ToImage = (base64: string): Promise<HTMLImageElement> =>
-	new Promise((resolve, reject) => {
-		const img = new Image();
-		img.onload = () => resolve(img);
-		img.onerror = reject;
-		img.src = `data:image/png;base64,${base64}`;
-	});
-
-const svgToImage = async (svg: SVGSVGElement): Promise<HTMLImageElement> => {
-	const svgString = new XMLSerializer().serializeToString(svg);
-	const blob = new Blob([svgString], {
-		type: "image/svg+xml;charset=utf-8",
-	});
-	const url = URL.createObjectURL(blob);
-	const image = await urlToImage(url);
-	URL.revokeObjectURL(url);
-	return image;
-};
-
-const sourceToSvg = async (
-	source: string,
-	options?: SourceOptions
-): Promise<SVGSVGElement> => {
-	const { type = "image/svg+xml", trim = false, color = "" } = options || {};
-	const ns = "http://www.w3.org/2000/svg";
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(source, type);
-	const svg = doc.querySelector("svg");
-
-	let error = doc.querySelector("parsererror")?.textContent || "";
-	[
-		"This page contains the following errors:",
-		"Below is a rendering of the page up to the first error.",
-	].forEach((phrase) => (error = error.replace(phrase, "")));
-	if (error) throw new Error(error);
-	if (!svg) throw new Error("No root SVG element");
-
-	if (trim) {
-		document.body.append(svg);
-		let { x, y, width, height } = svg.getBBox();
-		const strokeWidths = Array.from(svg.querySelectorAll("*")).map(
-			(el) => parseFloat(getComputedStyle(el).strokeWidth) || 0
-		);
-		const margin = Math.max(...strokeWidths) / 2;
-		x -= margin;
-		y -= margin;
-		width += 2 * margin;
-		height += 2 * margin;
-		document.body.removeChild(svg);
-		svg.setAttribute("viewBox", `${x} ${y} ${width} ${height}`);
-	}
-
-	if (color.startsWith("~")) {
-		svg.setAttribute("color", color.replace(/^~/, ""));
-	} else if (color) {
-		const filterId = getFilterId();
-		const filter = document.createElementNS(ns, "filter");
-		filter.setAttribute("id", filterId);
-
-		const flood = document.createElementNS(ns, "feFlood");
-		flood.setAttribute("flood-color", color);
-		flood.setAttribute("result", "flood");
-
-		const composite = document.createElementNS(ns, "feComposite");
-		composite.setAttribute("operator", "in");
-		composite.setAttribute("in", "flood");
-		composite.setAttribute("in2", "SourceAlpha");
-
-		filter.appendChild(flood);
-		filter.appendChild(composite);
-		svg.appendChild(filter);
-		svg.setAttribute("filter", `url(#${filterId})`);
-	}
-
-	return svg;
-};
-
-/** Pixelation Utility Functions */
-const getBayerMatrix = (size: string) => {
-	switch (size) {
-		case "4x4":
-			return [
-				[0, 8, 2, 10],
-				[12, 4, 14, 6],
-				[3, 11, 1, 9],
-				[15, 7, 13, 5],
-			];
-		case "2x2":
-			return [
-				[0, 2],
-				[3, 1],
-			];
-		case "8x8":
-			return [
-				[0, 48, 12, 60, 3, 51, 15, 63],
-				[32, 16, 44, 28, 35, 19, 47, 31],
-				[8, 56, 4, 52, 11, 59, 7, 55],
-				[40, 24, 36, 20, 43, 27, 39, 23],
-				[2, 50, 14, 62, 1, 49, 13, 61],
-				[34, 18, 46, 30, 33, 17, 45, 29],
-				[10, 58, 6, 54, 9, 57, 5, 53],
-				[42, 26, 38, 22, 41, 25, 37, 21],
-			];
-		default:
-			throw new Error(`Unsupported Bayer matrix size: ${size}`);
-	}
-};
-
-const colorDistance = (rgb1: number[], rgb2: number[]): number => {
-	const rmean = (rgb1[0] + rgb2[0]) / 2;
-	const r = rgb1[0] - rgb2[0];
-	const g = rgb1[1] - rgb2[1];
-	const b = rgb1[2] - rgb2[2];
-	return Math.sqrt(
-		(2 + rmean / 256) * r * r +
-			4 * g * g +
-			(2 + (255 - rmean) / 256) * b * b
-	);
-};
-
-const findClosestPaletteColor = (
-	rgb: number[],
-	palette: number[][]
-): number[] => {
-	let minDist = Number.MAX_VALUE;
-	let closest = palette[0];
-
-	for (const color of palette) {
-		const dist = colorDistance(rgb, color);
-		if (dist < minDist) {
-			minDist = dist;
-			closest = color;
-		}
-	}
-
-	return closest;
-};
-
-const distributeError = (
-	data: Uint8ClampedArray,
-	x: number,
-	y: number,
-	width: number,
-	height: number,
-	errR: number,
-	errG: number,
-	errB: number,
-	factor: number
-) => {
-	if (x < 0 || x >= width || y < 0 || y >= height) return;
-
-	const i = (y * width + x) * 4;
-	data[i] = Math.min(255, Math.max(0, data[i] + errR * factor));
-	data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + errG * factor));
-	data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + errB * factor));
-};
-
-const floydSteinbergDither = (
-	imageData: ImageData,
-	width: number,
-	height: number,
-	strength: number,
-	palette: number[][]
-): ImageData => {
-	const data = new Uint8ClampedArray(imageData.data);
-
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			const i = (y * width + x) * 4;
-
-			const oldR = data[i];
-			const oldG = data[i + 1];
-			const oldB = data[i + 2];
-
-			const newColor = findClosestPaletteColor(
-				[oldR, oldG, oldB],
-				palette
-			);
-
-			data[i] = newColor[0];
-			data[i + 1] = newColor[1];
-			data[i + 2] = newColor[2];
-
-			const errR = (oldR - newColor[0]) * strength;
-			const errG = (oldG - newColor[1]) * strength;
-			const errB = (oldB - newColor[2]) * strength;
-
-			distributeError(
-				data,
-				x + 1,
-				y,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				7 / 16
-			);
-			distributeError(
-				data,
-				x - 1,
-				y + 1,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				3 / 16
-			);
-			distributeError(
-				data,
-				x,
-				y + 1,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				5 / 16
-			);
-			distributeError(
-				data,
-				x + 1,
-				y + 1,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				1 / 16
-			);
-		}
-	}
-
-	return new ImageData(data, width, height);
-};
-
-const atkinsonDither = (
-	imageData: ImageData,
-	width: number,
-	height: number,
-	strength: number,
-	palette: number[][]
-): ImageData => {
-	const data = new Uint8ClampedArray(imageData.data);
-
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			const i = (y * width + x) * 4;
-
-			const oldR = data[i];
-			const oldG = data[i + 1];
-			const oldB = data[i + 2];
-
-			const newColor = findClosestPaletteColor(
-				[oldR, oldG, oldB],
-				palette
-			);
-
-			data[i] = newColor[0];
-			data[i + 1] = newColor[1];
-			data[i + 2] = newColor[2];
-
-			const errR = (oldR - newColor[0]) * strength;
-			const errG = (oldG - newColor[1]) * strength;
-			const errB = (oldB - newColor[2]) * strength;
-
-			distributeError(
-				data,
-				x + 1,
-				y,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				1 / 8
-			);
-			distributeError(
-				data,
-				x + 2,
-				y,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				1 / 8
-			);
-			distributeError(
-				data,
-				x - 1,
-				y + 1,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				1 / 8
-			);
-			distributeError(
-				data,
-				x,
-				y + 1,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				1 / 8
-			);
-			distributeError(
-				data,
-				x + 1,
-				y + 1,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				1 / 8
-			);
-			distributeError(
-				data,
-				x,
-				y + 2,
-				width,
-				height,
-				errR,
-				errG,
-				errB,
-				1 / 8
-			);
-		}
-	}
-
-	return new ImageData(data, width, height);
-};
-
-const orderedDither = (
-	imageData: ImageData,
-	width: number,
-	height: number,
-	strength: number,
-	palette: number[][],
-	bayerMatrix: number[][]
-): ImageData => {
-	const data = new Uint8ClampedArray(imageData.data);
-	const matrixSize = bayerMatrix.length;
-
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			const i = (y * width + x) * 4;
-			const oldColor = [data[i], data[i + 1], data[i + 2]];
-
-			const threshold =
-				((bayerMatrix[y % matrixSize][x % matrixSize] + 0.5) /
-					(matrixSize * matrixSize)) *
-				255;
-
-			const adjustedColor = [
-				oldColor[0] + (threshold - 127.5) * strength,
-				oldColor[1] + (threshold - 127.5) * strength,
-				oldColor[2] + (threshold - 127.5) * strength,
-			];
-
-			const newColor = findClosestPaletteColor(adjustedColor, palette);
-
-			data[i] = newColor[0];
-			data[i + 1] = newColor[1];
-			data[i + 2] = newColor[2];
-		}
-	}
-
-	return new ImageData(data, width, height);
-};
-
-const pixelate = async (options: {
-	image: HTMLImageElement;
-	width: number;
-	dither?: string;
-	strength?: number;
-	palette?: string[];
-	resolution?: "original" | "pixel";
-}): Promise<string> => {
-	const {
-		image,
-		width,
-		dither = "none",
-		strength = 0,
-		palette = null,
-		resolution = "original",
-	} = options;
-
-	const aspectRatio = image.height / image.width;
-	const pixelsWide = width;
-	const pixelsHigh = Math.round(pixelsWide * aspectRatio);
-
-	const canvas = document.createElement("canvas");
-	canvas.width = pixelsWide;
-	canvas.height = pixelsHigh;
-
-	const ctx = canvas.getContext("2d");
-	if (!ctx) throw new Error("Failed to get canvas context");
-	ctx.imageSmoothingEnabled = false;
-
-	ctx.drawImage(image, 0, 0, pixelsWide, pixelsHigh);
-
-	let imageData = ctx.getImageData(0, 0, pixelsWide, pixelsHigh);
-
-	if (palette) {
-		const rgbPalette = palette.map((hex) => {
-			const r = parseInt(hex.substr(1, 2), 16);
-			const g = parseInt(hex.substr(3, 2), 16);
-			const b = parseInt(hex.substr(5, 2), 16);
-			return [r, g, b];
-		});
-
-		switch (dither) {
-			case "Floyd-Steinberg":
-				imageData = floydSteinbergDither(
-					imageData,
-					pixelsWide,
-					pixelsHigh,
-					strength / 100,
-					rgbPalette
-				);
-				break;
-			case "4x4 Bayer":
-				imageData = orderedDither(
-					imageData,
-					pixelsWide,
-					pixelsHigh,
-					strength / 100,
-					rgbPalette,
-					getBayerMatrix("4x4")
-				);
-				break;
-			case "Atkinson":
-				imageData = atkinsonDither(
-					imageData,
-					pixelsWide,
-					pixelsHigh,
-					strength / 100,
-					rgbPalette
-				);
-				break;
-			case "2x2 Bayer":
-				imageData = orderedDither(
-					imageData,
-					pixelsWide,
-					pixelsHigh,
-					strength / 100,
-					rgbPalette,
-					getBayerMatrix("2x2")
-				);
-				break;
-			case "ordered":
-				imageData = orderedDither(
-					imageData,
-					pixelsWide,
-					pixelsHigh,
-					strength / 100,
-					rgbPalette,
-					getBayerMatrix("8x8")
-				);
-				break;
-		}
-
-		ctx.putImageData(imageData, 0, 0);
-	}
-
-	if (resolution === "original") {
-		const finalCanvas = document.createElement("canvas");
-		finalCanvas.width = image.width;
-		finalCanvas.height = image.height;
-		const finalCtx = finalCanvas.getContext("2d");
-		if (!finalCtx) throw new Error("Failed to get final canvas context");
-		finalCtx.imageSmoothingEnabled = false;
-		finalCtx.drawImage(canvas, 0, 0, finalCanvas.width, finalCanvas.height);
-		return finalCanvas.toDataURL("image/png").split(",")[1];
-	}
-
-	return canvas.toDataURL("image/png").split(",")[1];
-};
-
-/** Types */
-type SourceOptions = {
-	type?: DOMParserSupportedType;
-	trim?: boolean;
-	color?: string;
-};
-
-interface SharedResultsProps {
-	resultId: string;
-	trainerName: string;
-	teamSummary: string;
-	allPokemon: Pokemon[];
-	rankings?: {
-		grass?: { top: string; runnerUp: string; canRelate: string };
-		fire?: { top: string; runnerUp: string; canRelate: string };
-		water?: { top: string; runnerUp: string; canRelate: string };
-	};
-}
-
-/** Constants */
-const hexColors: Record<string, string> = {
-	grass: "#78C850",
-	fire: "#F08030",
-	water: "#6890F0",
-};
-
-const typeEmojis: Record<string, string> = {
-	grass: "🌿",
-	fire: "🔥",
-	water: "💧",
-};
+import {
+	Pokemon,
+	HatVariant,
+	DEFAULT_PALETTES,
+	SharedResultsProps,
+	hexColors,
+	typeEmojis,
+	pixelSizes,
+	ditherTypes,
+	strengthRange,
+} from "@/lib/constants";
+import { convertFileToBase64 } from "@/lib/base64-utils";
+import {
+	base64ToImage,
+	pixelate,
+	sourceToSvg,
+	svgToImage,
+} from "@/utils/manipulation";
+import { Pokeball } from "./Pokeball";
 
 /** Reusable Components */
 const ProductSelector = ({
@@ -2369,58 +1826,6 @@ const ProductViewer = ({
 	);
 };
 
-const Pokeball = ({
-	isOpen,
-	children,
-	imageSize,
-}: {
-	isOpen: boolean;
-	children: React.ReactNode;
-	imageSize: number;
-}) => (
-	<div
-		className="relative flex items-center justify-center"
-		style={{
-			width: `${imageSize}px`,
-			height: `${imageSize}px`,
-			overflow: "hidden",
-		}}
-	>
-		<svg viewBox="0 0 100 100" className="w-full h-full">
-			<circle cx="50" cy="50" r="50" fill="#f2f2f2" />
-			<path
-				d="M5,50 a1,1 0 0,1 90,0"
-				fill="#ff1a1a"
-				className={`transition-all duration-1000 ${
-					isOpen ? "translate-y-[-25px] rotate-[-25deg]" : ""
-				}`}
-			/>
-			<circle
-				cx="50"
-				cy="50"
-				r="12"
-				fill="#2c2c2c"
-				stroke="#f2f2f2"
-				strokeWidth="2"
-			/>
-			<path
-				d="M95,50 a1,1 0 0,1 -90,0"
-				fill="#f2f2f2"
-				className={`transition-all duration-1000 ${
-					isOpen ? "translate-y-[25px] rotate-[25deg]" : ""
-				}`}
-			/>
-		</svg>
-		<div
-			className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-				isOpen ? "opacity-100" : "opacity-0"
-			}`}
-		>
-			{children}
-		</div>
-	</div>
-);
-
 /** ProductModal Component with Updated Pixelation Logic */
 const ProductModal = ({
 	isVisible,
@@ -2446,19 +1851,9 @@ const ProductModal = ({
 
 	const applyRandomPixelation = useCallback(
 		async (imageBase64: string): Promise<string> => {
+			console.log("applyRandomPixelation ", imageBase64);
 			try {
 				const image = await base64ToImage(imageBase64);
-
-				// Random pixelation settings
-				const pixelSizes = [32, 48, 64, 96, 128];
-				const ditherTypes = [
-					"Floyd-Steinberg",
-					"4x4 Bayer",
-					"Atkinson",
-					"2x2 Bayer",
-					"ordered",
-				];
-				const strengthRange = { min: 20, max: 80 };
 
 				const options = {
 					image,
@@ -2493,17 +1888,28 @@ const ProductModal = ({
 				throw new Error("No image available");
 			}
 
-			// Apply pixelation to the image first
-			const pixelatedBase64 = await applyRandomPixelation(pngImage);
+			// // Apply pixelation to the image first
+			// const pixelatedBase64 = await applyRandomPixelation(pngImage);
 
-			// Send pixelated version to get hat variants
+			// // Send pixelated version to get hat variants
+			// const response = await fetch("/api/get-hat-variants", {
+			// 	method: "POST",
+			// 	headers: { "Content-Type": "application/json" },
+			// 	body: JSON.stringify({
+			// 		resultId,
+			// 		pngBase64: pixelatedBase64,
+			// 	}),
+			// });
+
+			// console.log("fetchVariants", pngImage);
+
+			const base64Data = pngImage.startsWith("data:image/png;base64,")
+				? pngImage.replace(/^data:image\/png;base64,/, "")
+				: pngImage;
 			const response = await fetch("/api/get-hat-variants", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					resultId,
-					pngBase64: pixelatedBase64,
-				}),
+				body: JSON.stringify({ resultId, pngBase64: base64Data }),
 			});
 
 			if (!response.ok) {
@@ -2708,17 +2114,6 @@ const SharedResults = ({
 			try {
 				const image = await base64ToImage(imageBase64);
 
-				// Random pixelation settings
-				const pixelSizes = [32, 48, 64, 96, 128];
-				const ditherTypes = [
-					"Floyd-Steinberg",
-					"4x4 Bayer",
-					"Atkinson",
-					"2x2 Bayer",
-					"ordered",
-				];
-				const strengthRange = { min: 20, max: 80 };
-
 				const options = {
 					image,
 					width: pixelSizes[
@@ -2745,197 +2140,52 @@ const SharedResults = ({
 		[]
 	);
 
-	// const handleViewPng = async (pokemon: Pokemon, index: number) => {
-	// 	if (pngImages[pokemon.name]) {
-	// 		try {
-	// 			// First pixelate the existing PNG
-	// 			const pixelatedBase64 = await applyRandomPixelation(
-	// 				pngImages[pokemon.name]
-	// 			);
-
-	// 			// Send pixelated version to generate-pokemon-svg
-	// 			const generateResponse = await fetch(
-	// 				"/api/generate-pokemon-svg",
-	// 				{
-	// 					method: "POST",
-	// 					headers: {
-	// 						"Content-Type": "application/json",
-	// 					},
-	// 					body: JSON.stringify({
-	// 						pokemon,
-	// 						index,
-	// 						pngBase64: pixelatedBase64,
-	// 						hexColor: hexColors[pokemon.type],
-	// 						emoji: typeEmojis[pokemon.type],
-	// 						originalImageSize: getImageSize(index),
-	// 						originalFontSize: getFontSize(index),
-	// 					}),
-	// 				}
-	// 			);
-
-	// 			if (!generateResponse.ok) {
-	// 				throw new Error("Failed to generate SVG");
-	// 			}
-
-	// 			setSelectedPokemon(pokemon);
-	// 			setSelectedPngImage(pixelatedBase64);
-	// 			setIsModalVisible(true);
-	// 			return;
-	// 		} catch (error) {
-	// 			console.error("Error handling PNG:", error);
-	// 			setErrorMessage("Failed to process image. Please try again.");
-	// 			return;
-	// 		}
-	// 	}
-
-	// 	setIsLoadingPng((prev) => ({ ...prev, [pokemon.name]: true }));
-	// 	try {
-	// 		// Try to fetch existing PNG first
-	// 		const response = await fetch("/api/get-pokemon-png", {
-	// 			method: "POST",
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 			},
-	// 			body: JSON.stringify({
-	// 				resultId,
-	// 				pokemonName: pokemon.name,
-	// 			}),
-	// 		});
-
-	// 		if (response.ok) {
-	// 			const data = await response.json();
-	// 			if (data.pngBase64) {
-	// 				// Store original version
-	// 				setPngImages((prev) => ({
-	// 					...prev,
-	// 					[pokemon.name]: data.pngBase64,
-	// 				}));
-
-	// 				// Pixelate it before sending to generate-pokemon-svg
-	// 				const pixelatedBase64 = await applyRandomPixelation(
-	// 					data.pngBase64
-	// 				);
-
-	// 				// Send pixelated version to generate-pokemon-svg
-	// 				const generateResponse = await fetch(
-	// 					"/api/generate-pokemon-svg",
-	// 					{
-	// 						method: "POST",
-	// 						headers: {
-	// 							"Content-Type": "application/json",
-	// 						},
-	// 						body: JSON.stringify({
-	// 							pokemon,
-	// 							index,
-	// 							pngBase64: pixelatedBase64,
-	// 							hexColor: hexColors[pokemon.type],
-	// 							emoji: typeEmojis[pokemon.type],
-	// 							originalImageSize: getImageSize(index),
-	// 							originalFontSize: getFontSize(index),
-	// 						}),
-	// 					}
-	// 				);
-
-	// 				if (!generateResponse.ok) {
-	// 					throw new Error("Failed to generate SVG");
-	// 				}
-
-	// 				setSelectedPokemon(pokemon);
-	// 				setSelectedPngImage(pixelatedBase64);
-	// 				setIsModalVisible(true);
-	// 				return;
-	// 			}
-	// 		}
-
-	// 		// If no existing PNG, create new one
-	// 		const svgResponse = await fetch("/api/generate-pokemon-svg", {
-	// 			method: "POST",
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 			},
-	// 			body: JSON.stringify({
-	// 				pokemon,
-	// 				index,
-	// 				hexColor: hexColors[pokemon.type],
-	// 				emoji: typeEmojis[pokemon.type],
-	// 				originalImageSize: getImageSize(index),
-	// 				originalFontSize: getFontSize(index),
-	// 			}),
-	// 		});
-
-	// 		if (!svgResponse.ok) {
-	// 			throw new Error("Failed to generate SVG");
-	// 		}
-
-	// 		const svgText = await svgResponse.text();
-	// 		const svgElement = await sourceToSvg(svgText, {});
-	// 		const image = await svgToImage(svgElement);
-
-	// 		const canvas = document.createElement("canvas");
-	// 		canvas.width = image.width;
-	// 		canvas.height = image.height;
-	// 		const ctx = canvas.getContext("2d");
-	// 		if (!ctx) throw new Error("Failed to get canvas context");
-
-	// 		ctx.drawImage(image, 0, 0);
-	// 		const originalPngBase64 = canvas
-	// 			.toDataURL("image/png")
-	// 			.split(",")[1];
-
-	// 		// Store original version
-	// 		setPngImages((prev) => ({
-	// 			...prev,
-	// 			[pokemon.name]: originalPngBase64,
-	// 		}));
-
-	// 		// Create pixelated version
-	// 		const pixelatedBase64 = await applyRandomPixelation(
-	// 			originalPngBase64
-	// 		);
-
-	// 		// Upload original PNG for future use
-	// 		const uploadResponse = await fetch("/api/upload-pokemon-png", {
-	// 			method: "POST",
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 			},
-	// 			body: JSON.stringify({
-	// 				resultId,
-	// 				pokemonName: pokemon.name,
-	// 				pngBase64: originalPngBase64,
-	// 			}),
-	// 		});
-
-	// 		if (!uploadResponse.ok) {
-	// 			throw new Error("Failed to upload PNG");
-	// 		}
-
-	// 		setSelectedPokemon(pokemon);
-	// 		setSelectedPngImage(pixelatedBase64);
-	// 		setIsModalVisible(true);
-	// 	} catch (error: unknown) {
-	// 		console.error("Error handling PNG:", error);
-	// 		setErrorMessage(
-	// 			error instanceof Error ? error.message : "Failed to load PNG"
-	// 		);
-	// 	} finally {
-	// 		setIsLoadingPng((prev) => ({ ...prev, [pokemon.name]: false }));
-	// 	}
-	// };
-
 	const handleViewPng = async (pokemon: Pokemon, index: number) => {
+		console.log("pokemon ", pokemon);
+		const ogBase64Image = await convertFileToBase64(
+			pokemon.image || "/placeholder-pokemon.png"
+		);
+		// console.log("handleViewPng", ogBase64Image);
+
+		// const ogBase64Data = ogBase64Image.startsWith("data:image/png;base64,")
+		// 	? ogBase64Image.replace(/^data:image\/png;base64,/, "")
+		// 	: ogBase64Image;
+
+		// console.log("ogbase64 ", ogBase64Data);
+
+		const ogPixelatedBase64 = await applyRandomPixelation(ogBase64Image);
+
+		const pixelatedOg = `data:image/png;base64,${ogPixelatedBase64}`;
+
+		console.log(pixelatedOg);
+
 		if (pngImages[pokemon.name]) {
 			try {
-				// First pixelate the existing PNG
-				const pixelatedBase64 = await applyRandomPixelation(
-					pngImages[pokemon.name]
-				);
+				// console.log("handleViewPng", pokemon.image);
+
+				// const base64Image = await convertFileToBase64(
+				// 	pokemon.image || "/placeholder-pokemon.png"
+				// );
+
+				// console.log("handleViewPng", base64Image);
+				// // First pixelate the existing PNG
+				// // const pixelatedBase64 = await applyRandomPixelation(
+				// // 	pngImages[pokemon.name]
+				// // );
+
+				// const pixelatedBase64 = await applyRandomPixelation(
+				// 	base64Image
+				// );
+
+				// console.log("handleViewPng", pixelatedBase64);
 
 				// Create a new pokemon object with the pixelated image but keep all other properties
-				const pixelatedPokemon = {
-					...pokemon,
-					image: `data:image/png;base64,${pixelatedBase64}`,
-				};
+				// const pixelatedPokemon = {
+				// 	...pokemon,
+				// 	// image: `data:image/png;base64,${pixelatedBase64}`,
+				// 	image: `data:image/png;base64,${pngImages[pokemon.name]}`,
+				// 	// image: pixelatedOg,
+				// };
 
 				// Send both original and pixelated versions to generate-pokemon-svg
 				const generateResponse = await fetch(
@@ -2946,7 +2196,9 @@ const SharedResults = ({
 							"Content-Type": "application/json",
 						},
 						body: JSON.stringify({
-							pokemon: pixelatedPokemon,
+							// pokemon: pixelatedPokemon,
+							pokemon,
+							pixelatedOg,
 							index,
 							hexColor: hexColors[pokemon.type],
 							emoji: typeEmojis[pokemon.type],
@@ -2961,7 +2213,8 @@ const SharedResults = ({
 				}
 
 				setSelectedPokemon(pokemon);
-				setSelectedPngImage(pixelatedBase64);
+				// setSelectedPngImage(pixelatedBase64);
+				setSelectedPngImage(pngImages[pokemon.name]);
 				setIsModalVisible(true);
 				return;
 			} catch (error) {
@@ -2988,22 +2241,45 @@ const SharedResults = ({
 			if (response.ok) {
 				const data = await response.json();
 				if (data.pngBase64) {
+					// console.log("handleViewPng", data.pngBase64);
 					// Store original version
 					setPngImages((prev) => ({
 						...prev,
 						[pokemon.name]: data.pngBase64,
 					}));
+					// console.log("pokemon.name ", data.pngBase64);
 
 					// Pixelate for display
-					const pixelatedBase64 = await applyRandomPixelation(
-						data.pngBase64
-					);
+					// const pixelatedBase64 = await applyRandomPixelation(
+					// 	data.pngBase64
+					// );
+
+					// console.log(pokemon.image);
+
+					// const base64Image = await convertFileToBase64(
+					// 	pokemon.image || "/placeholder-pokemon.png"
+					// );
+
+					// console.log("handleViewPng", base64Image);
+
+					// // console.log(base64Image);
+					// // First pixelate the existing PNG
+					// // const pixelatedBase64 = await applyRandomPixelation(
+					// // 	pngImages[pokemon.name]
+					// // );
+
+					// const pixelatedBase64 = await applyRandomPixelation(
+					// 	base64Image
+					// );
+
+					// console.log(pixelatedBase64);
 
 					// Create pokemon object with pixelated image for SVG generation
-					const pixelatedPokemon = {
-						...pokemon,
-						image: `data:image/png;base64,${pixelatedBase64}`,
-					};
+					// const pixelatedPokemon = {
+					// 	...pokemon,
+					// 	// image: `data:image/png;base64,${pixelatedBase64}`,
+					// 	image: `data:image/png;base64,${data.pngBase64}`,
+					// };
 
 					// Send to generate-pokemon-svg
 					const generateResponse = await fetch(
@@ -3014,7 +2290,9 @@ const SharedResults = ({
 								"Content-Type": "application/json",
 							},
 							body: JSON.stringify({
-								pokemon: pixelatedPokemon,
+								// pokemon: pixelatedPokemon,
+								pokemon,
+								pixelatedOg,
 								index,
 								hexColor: hexColors[pokemon.type],
 								emoji: typeEmojis[pokemon.type],
@@ -3029,7 +2307,8 @@ const SharedResults = ({
 					}
 
 					setSelectedPokemon(pokemon);
-					setSelectedPngImage(pixelatedBase64);
+					// setSelectedPngImage(pixelatedBase64);
+					setSelectedPngImage(data.pngBase64);
 					setIsModalVisible(true);
 					return;
 				}
@@ -3043,6 +2322,7 @@ const SharedResults = ({
 				},
 				body: JSON.stringify({
 					pokemon,
+					pixelatedOg,
 					index,
 					hexColor: hexColors[pokemon.type],
 					emoji: typeEmojis[pokemon.type],
@@ -3077,9 +2357,9 @@ const SharedResults = ({
 			}));
 
 			// Create pixelated version
-			const pixelatedBase64 = await applyRandomPixelation(
-				originalPngBase64
-			);
+			// const pixelatedBase64 = await applyRandomPixelation(
+			// 	originalPngBase64
+			// );
 
 			// Upload original PNG for future use
 			const uploadResponse = await fetch("/api/upload-pokemon-png", {
@@ -3099,7 +2379,8 @@ const SharedResults = ({
 			}
 
 			setSelectedPokemon(pokemon);
-			setSelectedPngImage(pixelatedBase64);
+			// setSelectedPngImage(pixelatedBase64);
+			setSelectedPngImage(originalPngBase64);
 			setIsModalVisible(true);
 		} catch (error: unknown) {
 			console.error("Error handling PNG:", error);
