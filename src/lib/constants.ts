@@ -1221,7 +1221,7 @@ export interface PrintfulFile {
 	width: number | null;
 	height: number | null;
 	dpi: number | null;
-	status: "waiting" | "processing" | "accepted" | "rejected";
+	status: "waiting" | "processing" | "accepted" | "rejected" | "ok";
 	created: string;
 	thumbnail_url: string | null;
 	preview_url: string | null;

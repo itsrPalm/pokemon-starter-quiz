@@ -13,52 +13,6 @@ import axios from "axios";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
-// export const uploadToPrintful = async (payload: YourPayloadType, apiKey: string) => {
-//   const response = await axios.post(
-//     "https://api.printful.com/v2/files",
-//     payload,
-//     {
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${apiKey}`,
-//       },
-//     }
-//   );
-//   return response.data.result;
-// };
-
-// export async function waitForFile(
-// 	client: PrintfulClient,
-// 	fileId: number,
-// 	maxAttempts = 5
-// ): Promise<PrintfulFile> {
-// 	console.log(`Waiting for file ${fileId} to process...`);
-
-// 	for (let i = 0; i < maxAttempts; i++) {
-// 		const response = await client.get(`v2/files/${fileId}`);
-// 		const fileData = response.data;
-
-// 		if (fileData) {
-// 			console.log(`File status check ${i + 1}/${maxAttempts}:`, {
-// 				fileId,
-// 				status: fileData.status,
-// 			});
-
-// 			if (fileData.status === "accepted") {
-// 				return fileData;
-// 			} else if (fileData.status === "rejected") {
-// 				throw new Error("File was rejected by Printful");
-// 			}
-// 		} else {
-// 			throw new Error("File data is undefined");
-// 		}
-
-// 		await new Promise((resolve) => setTimeout(resolve, 1000));
-// 	}
-
-// 	throw new Error("File processing timed out");
-// }
-
 export async function waitForFile(
 	client: PrintfulClient,
 	fileId: number,
@@ -82,11 +36,23 @@ export async function waitForFile(
 				hash: fileData.hash,
 			});
 
-			if (fileData.status === "accepted") {
+			// Accept both "ok" and "accepted" as success states
+			if (
+				(fileData.status as "ok" | "accepted") === "ok" ||
+				fileData.status === "accepted"
+			) {
 				return fileData;
 			} else if (
-				fileData.status === "rejected" ||
-				["failed", "waiting", "processing"].includes(fileData.status)
+				(fileData.status as
+					| "rejected"
+					| "failed"
+					| "waiting"
+					| "processing") === "rejected" ||
+				(fileData.status as
+					| "rejected"
+					| "failed"
+					| "waiting"
+					| "processing") === "failed"
 			) {
 				throw new Error(
 					`File was rejected by Printful with status: ${fileData.status}`
