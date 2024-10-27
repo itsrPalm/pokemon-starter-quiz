@@ -209,14 +209,14 @@ export async function POST(req: NextRequest) {
 		// 	);
 		// }
 
-		if (
-			(processedFile.status as string) !== "ok" ||
-			(processedFile.status as string) !== "accepted"
-		) {
-			throw new Error(
-				`File processing failed with status: ${processedFile.status}`
-			);
-		}
+		// if (
+		// 	(processedFile.status as string) !== "ok" ||
+		// 	(processedFile.status as string) !== "accepted"
+		// ) {
+		// 	throw new Error(
+		// 		`File processing failed with status: ${processedFile.status}`
+		// 	);
+		// }
 
 		const finalPrintfulUrl = processedFile.preview_url || printfulUrl;
 		console.log("Printful processing completed", {

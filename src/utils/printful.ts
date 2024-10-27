@@ -23,7 +23,7 @@ export async function waitForFile(
 	for (let i = 0; i < maxAttempts; i++) {
 		try {
 			const response = await client.get(`v2/files/${fileId}`);
-			const fileData = response.data;
+			const fileData = response.data; // Note: Added .data here to match Printful's response structure
 
 			if (!fileData) {
 				throw new Error("File data is undefined");
@@ -36,36 +36,26 @@ export async function waitForFile(
 				hash: fileData.hash,
 			});
 
-			// Accept both "ok" and "accepted" as success states
-			// if (fileData.status === "ok" || fileData.status === "accepted") {
-			// 	return fileData;
-			// } else if (
-			// 	fileData.status === "rejected" ||
-			// 	fileData.status === "failed"
-			// ) {
-			// 	throw new Error(
-			// 		`File was rejected by Printful with status: ${fileData.status}`
-			// 	);
-			// }
+			const status = fileData.status as PrintfulFile["status"];
 
-			const { status } = fileData;
 			switch (status) {
 				case "ok":
+				case "accepted":
 					return fileData;
+				case "rejected":
 				case "failed":
 					throw new Error(
-						`File was rejected by Printful with status: ${fileData.status}`
+						`File was rejected by Printful with status: ${status}`
+					);
+				case "waiting":
+				case "processing":
+					// Continue waiting
+					break;
+				default:
+					console.log(
+						`Unknown status received: ${status}, continuing to wait`
 					);
 			}
-			// if (fileData.status === "ok") {
-			// 	return fileData;
-			// } else if (
-			// 	fileData.status === "failed"
-			// ) {
-			// 	throw new Error(
-			// 		`File was rejected by Printful with status: ${fileData.status}`
-			// 	);
-			// }
 
 			// Exponential backoff with maximum of 5 seconds
 			const delay = Math.min(1000 * Math.pow(1.5, i), 5000);
